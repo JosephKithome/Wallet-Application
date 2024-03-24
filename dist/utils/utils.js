@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWalletExpiryDate = exports.accountNumberGenerator = void 0;
-function accountNumberGenerator() {
+export function accountNumberGenerator() {
     var accountNumber = '';
     var digits = '0123456789';
     // Generate 12 random digits
@@ -11,10 +8,8 @@ function accountNumberGenerator() {
     }
     return accountNumber;
 }
-exports.accountNumberGenerator = accountNumberGenerator;
-var getWalletExpiryDate = function () {
+export var getWalletExpiryDate = function () {
     var currentDate = new Date();
     // Add 2 years to the current date
     return currentDate.setFullYear(currentDate.getFullYear() + 3).toString();
 };
-exports.getWalletExpiryDate = getWalletExpiryDate;

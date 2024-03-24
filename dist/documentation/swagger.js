@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.swaggerDocument = void 0;
-exports.swaggerDocument = {
+export var swaggerDocument = {
     openapi: '3.0.0',
     info: {
         title: 'Wallet API Documentation',

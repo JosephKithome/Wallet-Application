@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,19 +34,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var chai_1 = require("chai");
-var chai_http_1 = __importDefault(require("chai-http"));
-var mocha_1 = require("mocha");
-var bcrypt_1 = __importDefault(require("bcrypt"));
-var schema_1 = require("../models/schema");
-var app_1 = require("../app");
-chai.use(chai_http_1.default); // Use chaiHttp plugin
-(0, mocha_1.describe)('User Registration', function () {
-    (0, mocha_1.it)('should register a new user successfully', function () { return __awaiter(void 0, void 0, void 0, function () {
+import { expect } from 'chai';
+import chaiHttp from 'chai-http';
+import { describe, it } from 'mocha';
+import bcrypt from 'bcrypt';
+import { User } from '../models/schema';
+import { app } from '../server/app';
+chai.use(chaiHttp); // Use chaiHttp plugin
+describe('User Registration', function () {
+    it('should register a new user successfully', function () { return __awaiter(void 0, void 0, void 0, function () {
         var userData, res, user, isPasswordCorrect;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -58,28 +53,28 @@ chai.use(chai_http_1.default); // Use chaiHttp plugin
                         password: 'password123'
                     };
                     // Clear existing user data
-                    return [4 /*yield*/, schema_1.User.deleteMany({})];
+                    return [4 /*yield*/, User.deleteMany({})];
                 case 1:
                     // Clear existing user data
                     _a.sent();
-                    return [4 /*yield*/, chai.request(app_1.app) // Use chai.request for HTTP requests
+                    return [4 /*yield*/, chai.request(app) // Use chai.request for HTTP requests
                             .post('/api/user/signup')
                             .send(userData)];
                 case 2:
                     res = _a.sent();
                     // Assert the response status code
-                    (0, chai_1.expect)(res.status).to.equal(200);
+                    expect(res.status).to.equal(200);
                     // Assert the response body
-                    (0, chai_1.expect)(res.body).to.have.property('message').to.equal('User registered successfully');
-                    return [4 /*yield*/, schema_1.User.findOne({ email: userData.email })];
+                    expect(res.body).to.have.property('message').to.equal('User registered successfully');
+                    return [4 /*yield*/, User.findOne({ email: userData.email })];
                 case 3:
                     user = _a.sent();
-                    (0, chai_1.expect)(user).to.exist;
-                    (0, chai_1.expect)(user === null || user === void 0 ? void 0 : user.username).to.equal(userData.username);
-                    return [4 /*yield*/, bcrypt_1.default.compare(userData.password, (user === null || user === void 0 ? void 0 : user.password) || '')];
+                    expect(user).to.exist;
+                    expect(user === null || user === void 0 ? void 0 : user.username).to.equal(userData.username);
+                    return [4 /*yield*/, bcrypt.compare(userData.password, (user === null || user === void 0 ? void 0 : user.password) || '')];
                 case 4:
                     isPasswordCorrect = _a.sent();
-                    (0, chai_1.expect)(isPasswordCorrect).to.be.true;
+                    expect(isPasswordCorrect).to.be.true;
                     return [2 /*return*/];
             }
         });
