@@ -1,4 +1,4 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import swaggerUi from 'swagger-ui-express';
