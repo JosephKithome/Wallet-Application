@@ -2,18 +2,18 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import swaggerUi from 'swagger-ui-express';
-import { dbConection } from './database/mongoConnector';
+import { dbConection } from '../database/mongoConnector';
 import {
     Transaction,
     User,
     Wallet
-} from './models/schema';
-import { swaggerDocument } from './documentation/swagger';
+} from '../models/schema';
+import { swaggerDocument } from '../documentation/swagger';
 import bcrypt from 'bcrypt';
 import {
     accountNumberGenerator,
     getWalletExpiryDate
-} from './utils/utils';
+} from '../utils/utils';
 
 export const app: Application = express();
 
