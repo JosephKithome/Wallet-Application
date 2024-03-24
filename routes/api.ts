@@ -1,21 +1,3 @@
-// const express = require("express")
-// const jwt = require('jsonwebtoken')
-// const router = express.Router()
-// const mongoose = require('mongoose');
-// const User = require("../models/user")
-
-
-// //defi=ine connection to the db
-// const dbConnect = "mongodb+srv://admin:adminPASS@cluster0.mwrenxs.mongodb.net/auth"
-
-// mongoose.connect(dbConnect, err =>{
-//     if(err){
-//         console.error("Error!", err);
-//     }else{
-//         console.log("Connected successfully Yaay!!");
-//     }
-// })
-
 // router.get('/', (req,res)=> {
 //     res.send("FROM API ROUTER");
 // })
