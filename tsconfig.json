@@ -1,14 +1,30 @@
 {
     "compilerOptions": {
-        "moduleResolution": "node",
-        "target": "es5",
-        "module": "ESNext",
-        "outDir": "./dist",
-        "strict": true,
-        "esModuleInterop": true
+      "target": "es6",
+      "module": "commonjs",
+      "outDir": "./dist",
+      "strict": true,
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "baseUrl": "./",
+      "paths": {
+        "*": [
+          "node_modules/*",
+          "src/types/*"
+        ]
+      }
     },
     "include": [
         "tests/*.ts",
-        "tests/test.ts"
+        "tests/test.ts",
+        "server/app.js"
+    ],
+    "exclude": [
+      "node_modules",
+      "**/*.spec.ts"
     ]
-}
+  }
+  

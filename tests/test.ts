@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http';
 import { describe, it } from 'mocha';
 import bcrypt from 'bcrypt';
 import { User } from '../models/schema';
-import { app } from '../server/app';
+import { app } from '../app';
 
 chai.use(chaiHttp); // Use chaiHttp plugin
 
