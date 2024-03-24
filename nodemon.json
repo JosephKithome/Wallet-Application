@@ -1,0 +1,8 @@
+{
+    "env":{
+        "SECRET_KEY":"lkNZpZGoRijbHU0jQMbD5UfUln0svjiG",
+        "MONGO_USER": "blackberry",
+        "MONGO_PASSWORD": "6NRlEX0xkOj0lXEa",
+        "MONGO_URI": "mongodb+srv://blackberry:6NRlEX0xkOj0lXEa@vibewire.uze1ulu.mongodb.net/?retryWrites=true&w=majority&appName=vibewire"
+    }
+}
