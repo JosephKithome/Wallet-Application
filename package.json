@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prestart": "npm run prebuild && tsc",
-    "prebuild": "npm install --force && npm install --save-dev @types/bcrypt && npm install --save-dev @types/mocha && npm install --save-dev @types/jsonwebtoken",
+    "prebuild": "npm install --save-dev @types/bcrypt && npm install --save-dev @types/mocha && npm install --save-dev @types/jsonwebtoken",
     "start": "node dist/app.js"
   },
   "author": "",
