@@ -443,7 +443,7 @@ exports.app.post('/api/v1/transaction/send', (req, resp) => __awaiter(void 0, vo
         });
         yield tr.save();
         //Trigger Notification here
-        resp.json({ message: 'Funds sent successfully' });
+        resp.json({ message: 'Funds sent successfully', newBalance: wallet.balance });
     }
     catch (error) {
         console.error('Error sending funds:', error);

@@ -513,7 +513,7 @@ app.post('/api/v1/transaction/send', async (req, resp) => {
 
         //Trigger Notification here
 
-        resp.json({ message: 'Funds sent successfully' });
+        resp.json({ message: 'Funds sent successfully',newBalance: wallet.balance });
     } catch (error) {
         console.error('Error sending funds:', error);
         resp.status(500).json({ message: 'Internal server error' });
