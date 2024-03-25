@@ -570,7 +570,7 @@ exports.app.get('/api/transaction/wallet/:walletId', (req, resp) => __awaiter(vo
     }
 }));
 // Server start
-const PORT = 4000;
+const PORT = 3000;
 function runServer() {
     try {
         (0, mongoConnector_1.dbConection)();
