@@ -660,7 +660,7 @@ app.get('/api/transaction/wallet/:walletId', async (req, resp) => {
 })
 
 // Server start
-const PORT: number = 4000;
+const PORT: number = 3000;
 
 function runServer() {
     try {
