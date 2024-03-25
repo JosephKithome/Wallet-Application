@@ -37,6 +37,7 @@ exports.User = mongoose_1.default.model('User', userSchema);
 const walletSchema = new mongoose_1.Schema({
     userId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
     balance: { type: Number, default: 0 },
+    name: { type: String, required: true },
     transactions: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Transaction' }],
     walletAccountNumber: { type: String, required: true },
     openedAt: { type: Date, default: Date.now },

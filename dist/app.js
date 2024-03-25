@@ -104,7 +104,7 @@ exports.app.get('/api/user/:userId', (req, resp) => __awaiter(void 0, void 0, vo
         if (!payload || typeof payload === 'string') {
             return resp.status(401).send("Unauthorized");
         }
-        const user = yield schema_1.User.findById(userId);
+        const user = yield schema_1.User.findById({ _id: userId });
         if (!user) {
             return resp.status(404).json({ message: 'User not found' });
         }
@@ -154,7 +154,8 @@ exports.app.put('/api/user/:userId', (req, resp) => __awaiter(void 0, void 0, vo
     }
 }));
 // Create Wallet account
-exports.app.post('/wallet', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.post('/api/v1/wallet', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name } = req.body;
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -186,8 +187,13 @@ exports.app.post('/wallet', (req, resp) => __awaiter(void 0, void 0, void 0, fun
             return resp.status(400).json({ error: 'User already has a wallet' });
         }
         // Create a new wallet for the user
+        // check if name is empty when creating a new wallet
+        if (!name) {
+            return resp.status(400).json({ error: 'Name of the wallet cannot be empty' });
+        }
         const newWallet = new schema_1.Wallet({
             userId: userId,
+            name: name,
             balance: 0,
             walletAccountNumber: (0, utils_1.accountNumberGenerator)().toString(),
             expiresAt: (0, utils_1.getWalletExpiryDate)()
@@ -443,7 +449,7 @@ exports.app.post('/api/transaction/send', (req, resp) => __awaiter(void 0, void 
     }
 }));
 // Define route for withdrawing funds from user's wallet
-exports.app.post('/api/users/:userId/wallet/withdraw', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.post('/api/user/:userId/wallet/withdraw', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     const { amount } = req.body;
     try {
         // Check if the authorization header is missing

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 export const dbConection = ()=>{
     mongoose
-    .connect('mongodb+srv://blackberry:6NRlEX0xkOj0lXEa@vibewire.uze1ulu.mongodb.net/?retryWrites=true&w=majority&appName=vibewire')
+    .connect(`${process.env.MONGO_URI}`)
     .then(() => {
         console.log('Connected to MongoDB');
     
