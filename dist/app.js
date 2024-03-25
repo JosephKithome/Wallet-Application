@@ -655,6 +655,12 @@ exports.app.post('/api/v1/currency', (req, resp) => __awaiter(void 0, void 0, vo
         if (!name || !code || !country) {
             return resp.status(400).json({ error: 'Name, code and country cannot be empty' });
         }
+        // check if the currency exists
+        const currency = yield schema_1.Currency.findOne({ code: code });
+        console.log("CUUUUUUUUU", currency);
+        if (currency) {
+            return resp.status(400).json({ error: 'Currency already exists' });
+        }
         // Create a new currency
         const newCurrency = new schema_1.Currency({
             name: name,
@@ -706,8 +712,12 @@ exports.app.get('/api/v1/currency', (req, resp) => __awaiter(void 0, void 0, voi
         resp.status(500).json({ error: 'An unexpected error occurred' });
     }
 }));
-/*Define the route for creating a bank account where users can wathdraw to from a wallet
-and  also they can top up their accounts from the bank account **/
+/*
+
+Define the route for creating a bank account where users can wathdraw to from a wallet
+and  also they can top up their accounts from the bank account
+
+**/
 exports.app.post('/api/v1/bank', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, currency, status } = req.body;
     try {

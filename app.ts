@@ -762,6 +762,7 @@ app.post('/api/v1/currency', async (req: Request, resp: Response) => {
         }
         // check if the currency exists
         const currency = await Currency.findOne({ code: code });
+        console.log("CUUUUUUUUU", currency)
         if (currency) {
             return resp.status(400).json({ error: 'Currency already exists' });
         }
