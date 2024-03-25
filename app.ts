@@ -112,7 +112,7 @@ app.get('/api/user/:userId', async (req, resp) => {
             return resp.status(401).send("Unauthorized");
         }
 
-        const user = await User.findById(userId);
+        const user = await User.findById({_id: userId});
         if (!user) {
             return resp.status(404).json({ message: 'User not found' });
         }
@@ -168,7 +168,9 @@ app.put('/api/user/:userId', async (req, resp) => {
 
 });
 // Create Wallet account
-app.post('/wallet', async (req: Request, resp: Response) => {
+app.post('/api/v1/wallet', async (req: Request, resp: Response) => {
+
+    const { name } = req.body;
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -207,8 +209,15 @@ app.post('/wallet', async (req: Request, resp: Response) => {
         }
 
         // Create a new wallet for the user
+
+        // check if name is empty when creating a new wallet
+        if (!name) {
+            return resp.status(400).json({ error: 'Name of the wallet cannot be empty' });
+        }
+
         const newWallet = new Wallet({
             userId: userId,
+            name: name,
             balance: 0,
             walletAccountNumber: accountNumberGenerator().toString(),
             expiresAt: getWalletExpiryDate()
@@ -510,7 +519,7 @@ app.post('/api/transaction/send', async (req, resp) => {
 });
 
 // Define route for withdrawing funds from user's wallet
-app.post('/api/users/:userId/wallet/withdraw', async (req, resp) => {
+app.post('/api/user/:userId/wallet/withdraw', async (req, resp) => {
     const { amount } = req.body;
     try {
 
@@ -650,7 +659,7 @@ app.get('/api/transaction/wallet/:walletId', async (req, resp) => {
         const { walletId } = req.params;
 
         // Query the database to find all transactions associated with the given walletId
-        const transactions = await Transaction.find({  });
+        const transactions = await Transaction.find({});
         // Send the list of transactions as the HTTP response
         resp.status(200).json({ transactions });
     } catch (error) {

@@ -29,6 +29,7 @@ export const User = mongoose.model<UserDocument>('User', userSchema);
 export interface WalletDocument extends Document {
     userId: string;
     balance: number;
+    name: string;
     walletAccountNumber: string;
     openedAt: { type: Date, required: true },
     expiresAt: { type: Date, required: true },
@@ -39,6 +40,7 @@ export interface WalletDocument extends Document {
 const walletSchema: Schema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     balance: { type: Number, default: 0 },
+    name: {type: String, required: true},
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
     walletAccountNumber: { type: String, required: true },
     openedAt: { type: Date, default: Date.now },
