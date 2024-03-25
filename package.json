@@ -2,10 +2,10 @@
   "name": "fincrarestapi",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx ts-node app.ts"
+    "start": "nodemon build/app.js"
   },
   "author": "",
   "license": "ISC",
