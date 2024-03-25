@@ -35,12 +35,31 @@ exports.app.get('/', (req, res) => {
 exports.app.post("/api/v1/user/signup", (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userData = req.body;
-        const user = new schema_1.User(userData);
+        // validate the incoming user data
+        if (userData.username !== undefined || userData.email === "") {
+            return resp.status(400).json({ error: 'Please provide a valid username' });
+        }
+        if (userData.password === "") {
+            return resp.status(400).json({ error: 'Please provide a valid password' });
+        }
+        if (userData.password.length < 8) {
+            return resp.status(400).json({ error: 'Password must be at least 8 characters long' });
+        }
+        if (userData.firstName == null || userData.firstName == undefined) {
+            return resp.status(400).json({ error: 'Please provide a valid first and last name' });
+        }
+        if (userData.lastName == null || userData.lastName == undefined) {
+            return resp.status(400).json({ error: 'Please provide a valid first and last name' });
+        }
+        if (userData.phone == null || userData.phone == undefined) {
+            return resp.status(400).json({ error: 'Please provide a valid phone number' });
+        }
         // check if user already exists
         const existingUser = yield schema_1.User.findOne({ email: userData.email });
         if (existingUser) {
             return resp.status(400).json({ error: 'User already exists' });
         }
+        const user = new schema_1.User(userData);
         const hashedPassword = yield bcrypt_1.default.hash(userData.password, 12);
         user.password = hashedPassword;
         const registeredUser = yield user.save();
@@ -59,6 +78,13 @@ exports.app.post("/api/v1/user/signup", (req, resp) => __awaiter(void 0, void 0,
 // Login endpoint
 exports.app.post("/api/v1/user/login", (req, resp) => {
     const userData = req.body;
+    //validate the  data
+    if (userData.email === "" || userData.password === "") {
+        return resp.status(400).json({ error: 'Please provide a valid email and password' });
+    }
+    if (userData.password.length < 8) {
+        return resp.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
     schema_1.User.findOne({ email: userData.email })
         .then((dbUser) => {
         if (!dbUser) {
@@ -103,6 +129,10 @@ exports.app.get('/api/v1/user/:userId', (req, resp) => __awaiter(void 0, void 0,
         // Check if payload is valid
         if (!payload || typeof payload === 'string') {
             return resp.status(401).send("Unauthorized");
+        }
+        // validate if user Id was provided
+        if (userId == null || userId == undefined) {
+            return resp.status(400).json({ error: 'Please provide a valid user ID' });
         }
         const user = yield schema_1.User.findById({ _id: userId });
         if (!user) {
@@ -207,6 +237,8 @@ exports.app.post('/api/v1/wallet', (req, resp) => __awaiter(void 0, void 0, void
     }
 }));
 exports.app.post('/api/v1/wallet/credit', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+    // Extract the amount to credit from the request body
+    const { amount } = req.body;
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -237,8 +269,6 @@ exports.app.post('/api/v1/wallet/credit', (req, resp) => __awaiter(void 0, void 
         if (!wallet) {
             return resp.status(404).json({ error: 'Wallet not found' });
         }
-        // Extract the amount to credit from the request body
-        const { amount } = req.body;
         // Validate the amount
         if (typeof amount !== 'number' || amount <= 0) {
             return resp.status(400).json({ error: 'Invalid amount' });
@@ -261,6 +291,7 @@ exports.app.post('/api/v1/wallet/credit', (req, resp) => __awaiter(void 0, void 
     }
 }));
 exports.app.get('/api/v1/wallet/balance', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+    const { walletAccountNumber } = req.body;
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -285,8 +316,11 @@ exports.app.get('/api/v1/wallet/balance', (req, resp) => __awaiter(void 0, void 
             return resp.status(401).send("Unauthorized");
         }
         const userId = payload.subject;
+        //check if the account number is empty
+        if (walletAccountNumber === null || walletAccountNumber === undefined) {
+            return resp.status(400).json({ error: 'Account number cannot be empty' });
+        }
         // Check if the user has a wallet
-        const { walletAccountNumber } = req.body;
         const wallet = yield schema_1.Wallet.findOne({ walletAccountNumber: walletAccountNumber });
         if (!wallet) {
             return resp.status(404).json({ error: 'Wallet not found' });
@@ -299,6 +333,8 @@ exports.app.get('/api/v1/wallet/balance', (req, resp) => __awaiter(void 0, void 
     }
 }));
 exports.app.post('/api/v1/wallet/debit', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+    // Extract the amount to credit from the request body
+    const { amount, walletAccountNumber } = req.body;
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -324,20 +360,22 @@ exports.app.post('/api/v1/wallet/debit', (req, resp) => __awaiter(void 0, void 0
         }
         // Extract userId from payload
         const userId = payload.subject;
+        //check if the account number is empty
+        if (walletAccountNumber === null || walletAccountNumber === undefined) {
+            return resp.status(400).json({ error: 'Account number cannot be empty' });
+        }
+        // Validate the amount
+        if (typeof amount !== 'number' || amount <= 0) {
+            return resp.status(400).json({ error: 'Invalid amount' });
+        }
         // Check if the user has a wallet
         const wallet = yield schema_1.Wallet.findOne({ userId: userId });
         if (!wallet) {
             return resp.status(404).json({ error: 'Wallet not found' });
         }
-        // Extract the amount to credit from the request body
-        const { amount, walletAccountNumber } = req.body;
         const receiver = yield schema_1.Wallet.findOne({ walletAccountNumber: walletAccountNumber });
         if (!receiver) {
             return resp.status(404).json({ error: 'Wallet not found' });
-        }
-        // Validate the amount
-        if (typeof amount !== 'number' || amount <= 0) {
-            return resp.status(400).json({ error: 'Invalid amount' });
         }
         // validate if the sending amount is more than the amount in the amount account
         if (amount > wallet.balance) {
@@ -399,14 +437,18 @@ exports.app.post('/api/v1/transaction/send', (req, resp) => __awaiter(void 0, vo
         }
         // Extract userId from payload
         const userId = payload.subject;
-        // Check if the user has a wallet
-        const wallet = yield schema_1.Wallet.findOne({ userId: userId });
-        if (!wallet) {
-            return resp.status(404).json({ error: 'Wallet for user not found' });
+        // check if the receiver amount exists
+        if (receiverAccountNumber === null || receiverAccountNumber === undefined) {
+            return resp.status(400).json({ error: 'Receiver account number cannot be empty' });
         }
         // Validate the amount
         if (typeof amount !== 'number' || amount <= 0) {
             return resp.status(400).json({ error: 'Invalid amount' });
+        }
+        // Check if the user has a wallet
+        const wallet = yield schema_1.Wallet.findOne({ userId: userId });
+        if (!wallet) {
+            return resp.status(404).json({ error: 'Wallet for user not found' });
         }
         // validate if the sending amount is more than the amount in the amount account
         if (amount > wallet.balance) {
@@ -478,8 +520,10 @@ exports.app.post('/api/v1/user/:userId/wallet/withdraw', (req, resp) => __awaite
         }
         // Extract userId from payload
         const userId = payload.subject;
-        console.log("USERID", userId);
-        console.log("USER", req.params.userId);
+        // validate if amount was provided
+        if (amount === null || amount === undefined) {
+            return resp.status(400).json({ error: 'Amount cannot be empty' });
+        }
         if (userId !== req.params.userId) {
             return resp.status(404).json({ message: 'You can only withdraw from your own account' });
         }
@@ -542,6 +586,8 @@ exports.app.get('/api/v1/user/:userId/wallet/transaction', (req, resp) => __awai
 }));
 // Define the route for getting a list of transactions by their wallet address
 exports.app.get('/api/v1/transaction/wallet/:walletId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+    // Retrieve the walletId from request parameters
+    const { walletId } = req.params;
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -567,10 +613,8 @@ exports.app.get('/api/v1/transaction/wallet/:walletId', (req, resp) => __awaiter
         }
         // Extract userId from payload
         const userId = payload.subject;
-        // Retrieve the walletId from request parameters
-        const { walletId } = req.params;
         // Query the database to find all transactions associated with the given walletId
-        const transactions = yield schema_1.Transaction.find({});
+        const transactions = yield schema_1.Transaction.find({ walletAccountNumber: walletId });
         // Send the list of transactions as the HTTP response
         resp.status(200).json({ transactions });
     }
@@ -607,6 +651,10 @@ exports.app.post('/api/v1/currency', (req, resp) => __awaiter(void 0, void 0, vo
         }
         // Extract userId from payload
         const userId = payload.subject;
+        // validate the incoming data
+        if (!name || !code || !country) {
+            return resp.status(400).json({ error: 'Name, code and country cannot be empty' });
+        }
         // Create a new currency
         const newCurrency = new schema_1.Currency({
             name: name,
@@ -615,6 +663,43 @@ exports.app.post('/api/v1/currency', (req, resp) => __awaiter(void 0, void 0, vo
         });
         yield newCurrency.save();
         resp.status(201).json({ message: 'Currency created successfully', currency: newCurrency });
+    }
+    catch (error) {
+        console.error('Error creating currency:', error);
+        resp.status(500).json({ error: 'An unexpected error occurred' });
+    }
+}));
+// Define the route to retrieve all currencies
+exports.app.get('/api/v1/currency', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Check if the authorization header is missing
+        if (!req.headers.authorization) {
+            return resp.status(401).send("Unauthorized request!!");
+        }
+        // Extract token from the authorization header
+        const token = req.headers.authorization.split(' ')[1];
+        // Check if the token is null
+        if (token === "null") {
+            return resp.status(401).send("Unauthorized");
+        }
+        let payload;
+        try {
+            // Verify the token
+            payload = jsonwebtoken_1.default.verify(token, `${process.env.SECRET_KEY}`);
+        }
+        catch (error) {
+            return resp.status(401).send("Unauthorized");
+        }
+        // Check if payload is valid
+        if (!payload || typeof payload === 'string') {
+            return resp.status(401).send("Unauthorized");
+        }
+        // Extract userId from payload
+        const userId = payload.subject;
+        // Query the database to find all currencies
+        const currencies = yield schema_1.Currency.find();
+        // Send the list of currencies as the HTTP response
+        resp.status(200).json({ message: 'Success', currencies });
     }
     catch (error) {
         console.error('Error creating currency:', error);
@@ -650,6 +735,18 @@ exports.app.post('/api/v1/bank', (req, resp) => __awaiter(void 0, void 0, void 0
         }
         // Extract userId from payload
         const userId = payload.subject;
+        //check if currency was provided
+        if (!currency) {
+            return resp.status(400).json({ message: 'Currency is required' });
+        }
+        //check if status was provided
+        if (!status) {
+            return resp.status(400).json({ message: 'Status is required' });
+        }
+        //check if name was provided
+        if (!name) {
+            return resp.status(400).json({ message: 'Name is required' });
+        }
         // validate the currency
         const currencyExists = yield schema_1.Currency.findOne({ code: currency });
         if (!currencyExists) {

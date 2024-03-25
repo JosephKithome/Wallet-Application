@@ -35,13 +35,31 @@ app.get('/', (req: Request, res: Response) => {
 app.post("/api/v1/user/signup", async (req: Request, resp: Response) => {
     try {
         const userData = req.body;
-        const user = new User(userData);
-
+        // validate the incoming user data
+        if (userData.username !== undefined || userData.email === "") {
+            return resp.status(400).json({ error: 'Please provide a valid username' });
+        }
+        if (userData.password === "") {
+            return resp.status(400).json({ error: 'Please provide a valid password' });
+        }
+        if (userData.password.length < 8) {
+            return resp.status(400).json({ error: 'Password must be at least 8 characters long' });
+        }
+        if (userData.firstName == null || userData.firstName == undefined) {
+            return resp.status(400).json({ error: 'Please provide a valid first and last name' });
+        }
+        if (userData.lastName == null || userData.lastName == undefined) {
+            return resp.status(400).json({ error: 'Please provide a valid first and last name' });
+        }
+        if (userData.phone == null || userData.phone == undefined) {
+            return resp.status(400).json({ error: 'Please provide a valid phone number' });
+        }
         // check if user already exists
         const existingUser = await User.findOne({ email: userData.email });
         if (existingUser) {
             return resp.status(400).json({ error: 'User already exists' });
         }
+        const user = new User(userData);
         const hashedPassword = await bcrypt.hash(userData.password, 12);
         user.password = hashedPassword
         const registeredUser = await user.save();
@@ -62,6 +80,13 @@ app.post("/api/v1/user/signup", async (req: Request, resp: Response) => {
 app.post("/api/v1/user/login", (req: Request, resp: Response) => {
     const userData = req.body;
 
+    //validate the  data
+    if (userData.email === "" || userData.password === "") {
+        return resp.status(400).json({ error: 'Please provide a valid email and password' });
+    }
+    if (userData.password.length < 8) {
+        return resp.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
     User.findOne({ email: userData.email })
         .then((dbUser: any) => {
             if (!dbUser) {
@@ -115,7 +140,12 @@ app.get('/api/v1/user/:userId', async (req, resp) => {
             return resp.status(401).send("Unauthorized");
         }
 
-        const user = await User.findById({_id: userId});
+        // validate if user Id was provided
+        if (userId == null || userId == undefined) {
+            return resp.status(400).json({ error: 'Please provide a valid user ID' });
+        }
+
+        const user = await User.findById({ _id: userId });
         if (!user) {
             return resp.status(404).json({ message: 'User not found' });
         }
@@ -235,6 +265,8 @@ app.post('/api/v1/wallet', async (req: Request, resp: Response) => {
 });
 
 app.post('/api/v1/wallet/credit', async (req: Request, resp: Response) => {
+    // Extract the amount to credit from the request body
+    const { amount } = req.body;
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -271,9 +303,6 @@ app.post('/api/v1/wallet/credit', async (req: Request, resp: Response) => {
         if (!wallet) {
             return resp.status(404).json({ error: 'Wallet not found' });
         }
-
-        // Extract the amount to credit from the request body
-        const { amount } = req.body;
 
         // Validate the amount
         if (typeof amount !== 'number' || amount <= 0) {
@@ -299,6 +328,7 @@ app.post('/api/v1/wallet/credit', async (req: Request, resp: Response) => {
 });
 
 app.get('/api/v1/wallet/balance', async (req: Request, resp: Response) => {
+    const { walletAccountNumber } = req.body
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -326,10 +356,12 @@ app.get('/api/v1/wallet/balance', async (req: Request, resp: Response) => {
         if (!payload || typeof payload === 'string') {
             return resp.status(401).send("Unauthorized");
         }
-
         const userId = payload.subject;
+        //check if the account number is empty
+        if (walletAccountNumber === null || walletAccountNumber === undefined) {
+            return resp.status(400).json({ error: 'Account number cannot be empty' });
+        }
         // Check if the user has a wallet
-        const { walletAccountNumber } = req.body
         const wallet = await Wallet.findOne({ walletAccountNumber: walletAccountNumber });
         if (!wallet) {
             return resp.status(404).json({ error: 'Wallet not found' });
@@ -343,6 +375,9 @@ app.get('/api/v1/wallet/balance', async (req: Request, resp: Response) => {
 });
 
 app.post('/api/v1/wallet/debit', async (req: Request, resp: Response) => {
+    // Extract the amount to credit from the request body
+    const { amount, walletAccountNumber } = req.body;
+
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -374,23 +409,25 @@ app.post('/api/v1/wallet/debit', async (req: Request, resp: Response) => {
         // Extract userId from payload
         const userId = payload.subject;
 
+        //check if the account number is empty
+        if (walletAccountNumber === null || walletAccountNumber === undefined) {
+            return resp.status(400).json({ error: 'Account number cannot be empty' });
+        }
+
+        // Validate the amount
+        if (typeof amount !== 'number' || amount <= 0) {
+            return resp.status(400).json({ error: 'Invalid amount' });
+        }
+
         // Check if the user has a wallet
         const wallet = await Wallet.findOne({ userId: userId });
         if (!wallet) {
             return resp.status(404).json({ error: 'Wallet not found' });
         }
 
-        // Extract the amount to credit from the request body
-        const { amount, walletAccountNumber } = req.body;
-
         const receiver = await Wallet.findOne({ walletAccountNumber: walletAccountNumber })
         if (!receiver) {
             return resp.status(404).json({ error: 'Wallet not found' });
-        }
-
-        // Validate the amount
-        if (typeof amount !== 'number' || amount <= 0) {
-            return resp.status(400).json({ error: 'Invalid amount' });
         }
 
         // validate if the sending amount is more than the amount in the amount account
@@ -433,7 +470,9 @@ app.post('/api/v1/wallet/debit', async (req: Request, resp: Response) => {
 
 // Define route for sending funds
 app.post('/api/v1/transaction/send', async (req, resp) => {
+
     const { amount, receiverAccountNumber } = req.body;
+
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -465,15 +504,20 @@ app.post('/api/v1/transaction/send', async (req, resp) => {
         // Extract userId from payload
         const userId = payload.subject;
 
-        // Check if the user has a wallet
-        const wallet = await Wallet.findOne({ userId: userId });
-        if (!wallet) {
-            return resp.status(404).json({ error: 'Wallet for user not found' });
+        // check if the receiver amount exists
+        if (receiverAccountNumber === null || receiverAccountNumber === undefined) {
+            return resp.status(400).json({ error: 'Receiver account number cannot be empty' });
         }
 
         // Validate the amount
         if (typeof amount !== 'number' || amount <= 0) {
             return resp.status(400).json({ error: 'Invalid amount' });
+        }
+
+        // Check if the user has a wallet
+        const wallet = await Wallet.findOne({ userId: userId });
+        if (!wallet) {
+            return resp.status(404).json({ error: 'Wallet for user not found' });
         }
 
         // validate if the sending amount is more than the amount in the amount account
@@ -516,7 +560,7 @@ app.post('/api/v1/transaction/send', async (req, resp) => {
 
         //Trigger Notification here
 
-        resp.json({ message: 'Funds sent successfully',newBalance: wallet.balance });
+        resp.json({ message: 'Funds sent successfully', newBalance: wallet.balance });
     } catch (error) {
         console.error('Error sending funds:', error);
         resp.status(500).json({ message: 'Internal server error' });
@@ -558,8 +602,10 @@ app.post('/api/v1/user/:userId/wallet/withdraw', async (req, resp) => {
         // Extract userId from payload
         const userId = payload.subject;
 
-        console.log("USERID", userId)
-        console.log("USER", req.params.userId)
+        // validate if amount was provided
+        if (amount === null || amount === undefined) {
+            return resp.status(400).json({ error: 'Amount cannot be empty' });
+        }
 
         if (userId !== req.params.userId) {
             return resp.status(404).json({ message: 'You can only withdraw from your own account' });
@@ -631,6 +677,9 @@ app.get('/api/v1/user/:userId/wallet/transaction', async (req, resp) => {
 
 // Define the route for getting a list of transactions by their wallet address
 app.get('/api/v1/transaction/wallet/:walletId', async (req, resp) => {
+    // Retrieve the walletId from request parameters
+    const { walletId } = req.params;
+
     try {
 
         // Check if the authorization header is missing
@@ -663,11 +712,8 @@ app.get('/api/v1/transaction/wallet/:walletId', async (req, resp) => {
         // Extract userId from payload
         const userId = payload.subject;
 
-        // Retrieve the walletId from request parameters
-        const { walletId } = req.params;
-
         // Query the database to find all transactions associated with the given walletId
-        const transactions = await Transaction.find({});
+        const transactions = await Transaction.find({ walletAccountNumber: walletId });
         // Send the list of transactions as the HTTP response
         resp.status(200).json({ transactions });
     } catch (error) {
@@ -678,7 +724,7 @@ app.get('/api/v1/transaction/wallet/:walletId', async (req, resp) => {
 
 // Define the route for creating a currency
 app.post('/api/v1/currency', async (req: Request, resp: Response) => {
-    const { name,code,country } = req.body;
+    const { name, code, country } = req.body;
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -710,10 +756,15 @@ app.post('/api/v1/currency', async (req: Request, resp: Response) => {
         // Extract userId from payload
         const userId = payload.subject;
 
+        // validate the incoming data
+        if (!name ||!code ||!country) {
+            return resp.status(400).json({ error: 'Name, code and country cannot be empty' });
+        }
+
         // Create a new currency
         const newCurrency = new Currency({
             name: name,
-            code:  code,
+            code: code,
             country: country
         });
         await newCurrency.save();
@@ -725,9 +776,56 @@ app.post('/api/v1/currency', async (req: Request, resp: Response) => {
     }
 });
 
+// Define the route to retrieve all currencies
+app.get('/api/v1/currency', async (req: Request, resp: Response) => {
+    try {
+        // Check if the authorization header is missing
+        if (!req.headers.authorization) {
+            return resp.status(401).send("Unauthorized request!!");
+        }
 
-/*Define the route for creating a bank account where users can wathdraw to from a wallet
-and  also they can top up their accounts from the bank account **/
+        // Extract token from the authorization header
+        const token = req.headers.authorization.split(' ')[1];
+
+        // Check if the token is null
+        if (token === "null") {
+            return resp.status(401).send("Unauthorized");
+        }
+
+        let payload: string | JwtPayload;
+
+        try {
+            // Verify the token
+            payload = jwt.verify(token, `${process.env.SECRET_KEY}`) as JwtPayload;
+        } catch (error) {
+            return resp.status(401).send("Unauthorized");
+        }
+
+        // Check if payload is valid
+        if (!payload || typeof payload === 'string') {
+            return resp.status(401).send("Unauthorized");
+        }
+
+        // Extract userId from payload
+        const userId = payload.subject;
+
+        // Query the database to find all currencies
+        const currencies = await Currency.find();
+        // Send the list of currencies as the HTTP response
+        resp.status(200).json({message: 'Success', currencies });
+    } catch (error) {
+        console.error('Error creating currency:', error);
+        resp.status(500).json({ error: 'An unexpected error occurred' });
+    }
+});
+
+
+/*
+
+Define the route for creating a bank account where users can wathdraw to from a wallet
+and  also they can top up their accounts from the bank account 
+
+**/
 app.post('/api/v1/bank', async (req: Request, resp: Response) => {
     const { name, currency, status } = req.body;
     try {
@@ -760,6 +858,18 @@ app.post('/api/v1/bank', async (req: Request, resp: Response) => {
 
         // Extract userId from payload
         const userId = payload.subject;
+        //check if currency was provided
+        if (!currency) {
+            return resp.status(400).json({ message: 'Currency is required' });
+        }
+        //check if status was provided
+        if (!status) {
+            return resp.status(400).json({ message: 'Status is required' });
+        }
+        //check if name was provided
+        if (!name) {
+            return resp.status(400).json({ message: 'Name is required' });
+        }
 
         // validate the currency
         const currencyExists = await Currency.findOne({ code: currency });

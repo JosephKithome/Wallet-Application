@@ -9,6 +9,7 @@ export interface UserDocument extends Document {
     email: string;
     dob: string; // represents  date of birth to make sure that the user is eligible to own a bank account
     password: string;
+    phone: string;
 }
 
 const userSchema: Schema = new Schema({
@@ -18,6 +19,7 @@ const userSchema: Schema = new Schema({
     dob: { type: String, required: false },
     email: { type: String, required: true },
     password: { type: String, required: true },
+    phone: { type: String, required: false },
 
 });
 
