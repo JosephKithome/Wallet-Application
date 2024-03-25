@@ -5,8 +5,11 @@
   "main": "dist/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prebuild": "npm i --save-dev @types/bcrypt && npm i --save-dev @types/mocha && npm i --save-dev @types/jsonwebtoken",
-    "start": "tsc && node dist/app.js"
+    "prebuild": "npm run installBcryptTypes && npm run installMissingTypes && npm run installMissingDeclaration",
+    "start": "tsc && node dist/app.js",
+    "installBcryptTypes": "npm list --depth=0 --json | jq '.dependencies[\"@types/bcrypt\"]' | grep -qE '\"version\": \".*\"' && echo 'Bcrypt types already installed' || npm install --save-dev @types/bcrypt",
+    "installMissingTypes": "npm list --depth=0 --json | jq 'del(.dependencies[\"@types/bcrypt\"])' | jq 'del(.dependencies[\"@types/mocha\"])' | jq 'del(.dependencies[\"@types/jsonwebtoken\"])' | grep -qE '\"version\": \".*\"' && echo 'All types installed' || npm install --save-dev @types/mocha @types/jsonwebtoken",
+    "installMissingDeclaration": "test -f ./bcrypt.d.ts && echo 'Bcrypt declaration file exists' || echo 'declare module \"bcrypt\";' > ./bcrypt.d.ts"
   },
   "author": "",
   "license": "ISC",
