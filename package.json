@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-     "prebuild": "npm i --save-dev @types/bcrypt && npm i --save-dev @types/mocha && npm i --save-dev @types/jsonwebtoken --force",
+     "prebuild": "npm install --force",
     "start": "tsc && node dist/app.js"
   },
   "author": "",
