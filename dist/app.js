@@ -503,7 +503,7 @@ exports.app.post('/api/v1/user/:userId/wallet/withdraw', (req, resp) => __awaite
     }
 }));
 // Define route for getting transaction history for user's wallet
-exports.app.get('/api/v1/user/:userId/wallet/transactions', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.get('/api/v1/user/:userId/wallet/transaction', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -541,7 +541,7 @@ exports.app.get('/api/v1/user/:userId/wallet/transactions', (req, resp) => __awa
     }
 }));
 // Define the route
-exports.app.get('/api/v1/ransaction/wallet/:walletId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.get('/api/v1/transaction/wallet/:walletId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {

@@ -584,7 +584,7 @@ app.post('/api/v1/user/:userId/wallet/withdraw', async (req, resp) => {
 });
 
 // Define route for getting transaction history for user's wallet
-app.get('/api/v1/user/:userId/wallet/transactions', async (req, resp) => {
+app.get('/api/v1/user/:userId/wallet/transaction', async (req, resp) => {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -627,7 +627,7 @@ app.get('/api/v1/user/:userId/wallet/transactions', async (req, resp) => {
 });
 
 // Define the route
-app.get('/api/v1/ransaction/wallet/:walletId', async (req, resp) => {
+app.get('/api/v1/transaction/wallet/:walletId', async (req, resp) => {
     try {
 
         // Check if the authorization header is missing
