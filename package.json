@@ -2,10 +2,10 @@
   "name": "fincrarestapi",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/app.js",
+  "main": "dist/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node build/app.js"
+    "start": "node dist/app.js"
   },
   "author": "",
   "license": "ISC",
