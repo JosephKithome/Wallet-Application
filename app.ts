@@ -4,6 +4,8 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import swaggerUi from 'swagger-ui-express';
 import { dbConection } from './database/mongoConnector';
 import {
+    BankAccount,
+    Currency,
     Transaction,
     User,
     Wallet
@@ -12,6 +14,7 @@ import { swaggerDocument } from './documentation/swagger';
 import bcrypt from 'bcrypt';
 import {
     accountNumberGenerator,
+    generateRandomCVV,
     getWalletExpiryDate
 } from './utils/utils';
 
@@ -626,7 +629,7 @@ app.get('/api/v1/user/:userId/wallet/transaction', async (req, resp) => {
     }
 });
 
-// Define the route
+// Define the route for getting a list of transactions by their wallet address
 app.get('/api/v1/transaction/wallet/:walletId', async (req, resp) => {
     try {
 
@@ -671,7 +674,118 @@ app.get('/api/v1/transaction/wallet/:walletId', async (req, resp) => {
         console.error('Error fetching transactions:', error);
         resp.status(500).json({ error: 'Internal server error' });
     }
-})
+});
+
+// Define the route for creating a currency
+app.post('/api/v1/currency', async (req: Request, resp: Response) => {
+    const { name,code,country } = req.body;
+    try {
+        // Check if the authorization header is missing
+        if (!req.headers.authorization) {
+            return resp.status(401).send("Unauthorized request!!");
+        }
+
+        // Extract token from the authorization header
+        const token = req.headers.authorization.split(' ')[1];
+
+        // Check if the token is null
+        if (token === "null") {
+            return resp.status(401).send("Unauthorized");
+        }
+
+        let payload: string | JwtPayload;
+
+        try {
+            // Verify the token
+            payload = jwt.verify(token, `${process.env.SECRET_KEY}`) as JwtPayload;
+        } catch (error) {
+            return resp.status(401).send("Unauthorized");
+        }
+
+        // Check if payload is valid
+        if (!payload || typeof payload === 'string') {
+            return resp.status(401).send("Unauthorized");
+        }
+
+        // Extract userId from payload
+        const userId = payload.subject;
+
+        // Create a new currency
+        const newCurrency = new Currency({
+            name: name,
+            code:  code,
+            country: country
+        });
+        await newCurrency.save();
+
+        resp.status(201).json({ message: 'Currency created successfully', currency: newCurrency });
+    } catch (error) {
+        console.error('Error creating currency:', error);
+        resp.status(500).json({ error: 'An unexpected error occurred' });
+    }
+});
+
+
+/*Define the route for creating a bank account where users can wathdraw to from a wallet
+and  also they can top up their accounts from the bank account **/
+app.post('/api/v1/bank', async (req: Request, resp: Response) => {
+    const { name, currency, status } = req.body;
+    try {
+        // Check if the authorization header is missing
+        if (!req.headers.authorization) {
+            return resp.status(401).send("Unauthorized request!!");
+        }
+
+        // Extract token from the authorization header
+        const token = req.headers.authorization.split(' ')[1];
+
+        // Check if the token is null
+        if (token === "null") {
+            return resp.status(401).send("Unauthorized");
+        }
+
+        let payload: string | JwtPayload;
+
+        try {
+            // Verify the token
+            payload = jwt.verify(token, `${process.env.SECRET_KEY}`) as JwtPayload;
+        } catch (error) {
+            return resp.status(401).send("Unauthorized");
+        }
+
+        // Check if payload is valid
+        if (!payload || typeof payload === 'string') {
+            return resp.status(401).send("Unauthorized");
+        }
+
+        // Extract userId from payload
+        const userId = payload.subject;
+
+        // validate the currency
+        const currencyExists = await Currency.findOne({ code: currency });
+        if (!currencyExists) {
+            return resp.status(404).json({ message: 'Currency not found' });
+        }
+        // Create a new bank account
+        const newBankAccount = new BankAccount({
+            userId: userId,
+            name: name,
+            accountNumber: accountNumberGenerator().toString(),
+            openedAt: new Date(),
+            expiresAt: getWalletExpiryDate(),
+            cvv: generateRandomCVV(),
+            balance: 0,
+            status: 'active',
+            currency: req.body.currency // Assuming currency is provided in the request body
+        });
+        await newBankAccount.save();
+
+        resp.status(201).json({ message: 'Bank account created successfully', bankAccount: newBankAccount });
+    } catch (error) {
+        console.error('Error creating bank account:', error);
+        resp.status(500).json({ error: 'An unexpected error occurred' });
+    }
+});
 
 // Server start
 const PORT = process.env.PORT || 3000;

@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Notification = exports.TransactionCategory = exports.PaymentMethod = exports.BankAccount = exports.Transaction = exports.Wallet = exports.User = void 0;
+exports.Currency = exports.Notification = exports.TransactionCategory = exports.PaymentMethod = exports.BankAccount = exports.Transaction = exports.Wallet = exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const userSchema = new mongoose_1.Schema({
     username: { type: String, required: true },
@@ -60,6 +60,8 @@ const bankAccountSchema = new mongoose_1.Schema({
     expiresAt: { type: Date, required: true },
     cvv: { type: String, required: true },
     balance: { type: Number, default: 0 },
+    status: { type: String, default: 'active' },
+    currency: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Currency', required: true },
 });
 exports.BankAccount = mongoose_1.default.model('BankAccount', bankAccountSchema);
 const paymentMethodSchema = new mongoose_1.Schema({
@@ -81,4 +83,12 @@ const notificationSchema = new mongoose_1.Schema({
     // Additional metadata fields
 });
 exports.Notification = mongoose_1.default.model('Notification', notificationSchema);
-/*****************************************End Notification schema***************************************************************************** */
+// Define Mongoose schema for the currency
+const currencySchema = new mongoose_1.Schema({
+    name: { type: String, required: true },
+    code: { type: String, required: true },
+    country: { type: String, required: true },
+});
+// Create and export the Mongoose model
+exports.Currency = mongoose_1.default.model('Currency', currencySchema);
+/*****************************************End currency schema***************************************************************************** */

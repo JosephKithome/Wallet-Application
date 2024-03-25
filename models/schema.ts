@@ -83,7 +83,10 @@ export interface BankAccountDocument extends Document {
     expiresAt: Date;
     cvv: string
     balance: number;
+    status: string;
+    currency: string;
 }
+
 
 const bankAccountSchema: Schema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -92,6 +95,8 @@ const bankAccountSchema: Schema = new Schema({
     expiresAt: { type: Date, required: true },
     cvv: { type: String, required: true },
     balance: { type: Number, default: 0 },
+    status: { type: String, default: 'active' },
+    currency: { type: Schema.Types.ObjectId, ref: 'Currency', required: true },
 });
 
 export const BankAccount = mongoose.model<BankAccountDocument>('BankAccount', bankAccountSchema);
@@ -150,4 +155,23 @@ const notificationSchema: Schema = new Schema({
 
 export const Notification = mongoose.model<NotificationDocument>('Notification', notificationSchema);
 /*****************************************End Notification schema***************************************************************************** */
+
+
+/*****************************************Start currency document******************************************************************************* */
+export interface CurrencyDocument extends Document {
+    name: string;
+    code: string;
+    country: string;
+}
+// Define Mongoose schema for the currency
+const currencySchema: Schema<CurrencyDocument> = new Schema({
+    name: { type: String, required: true },
+    code: { type: String, required: true },
+    country: { type: String, required: true },
+});
+
+// Create and export the Mongoose model
+export const Currency = mongoose.model<CurrencyDocument>('Currency', currencySchema);
+
+/*****************************************End currency schema***************************************************************************** */
 
