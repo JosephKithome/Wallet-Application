@@ -260,7 +260,7 @@ exports.app.post('/api/v1/wallet/credit', (req, resp) => __awaiter(void 0, void 
         resp.status(500).json({ error: 'An unexpected error occurred' });
     }
 }));
-exports.app.get('api/v1/wallet/balance', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.get('/api/v1/wallet/balance', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -298,7 +298,7 @@ exports.app.get('api/v1/wallet/balance', (req, resp) => __awaiter(void 0, void 0
         resp.status(500).json({ error: 'An unexpected error occurred' });
     }
 }));
-exports.app.post('qpi/v1/wallet/debit', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.post('/api/v1/wallet/debit', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {

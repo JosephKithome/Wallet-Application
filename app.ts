@@ -295,7 +295,7 @@ app.post('/api/v1/wallet/credit', async (req: Request, resp: Response) => {
     }
 });
 
-app.get('api/v1/wallet/balance', async (req: Request, resp: Response) => {
+app.get('/api/v1/wallet/balance', async (req: Request, resp: Response) => {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -339,7 +339,7 @@ app.get('api/v1/wallet/balance', async (req: Request, resp: Response) => {
     }
 });
 
-app.post('qpi/v1/wallet/debit', async (req: Request, resp: Response) => {
+app.post('/api/v1/wallet/debit', async (req: Request, resp: Response) => {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
