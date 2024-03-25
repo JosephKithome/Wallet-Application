@@ -8,12 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const supertest_1 = __importDefault(require("supertest"));
-const app_1 = require("../app");
+const request = require('supertest');
+const { app } = require('../app');
 // Describe block for the test suite
 describe('POST /api/v1/user/login', () => {
     // Test case for valid login
@@ -23,7 +19,7 @@ describe('POST /api/v1/user/login', () => {
             password: 'password123' // Assuming this is a valid password
         };
         // Send a POST request to the login endpoint with valid credentials
-        const response = yield (0, supertest_1.default)(app_1.app)
+        const response = yield request(app)
             .post('/api/v1/user/login')
             .send(userData);
         // Expect status code 200
@@ -38,7 +34,7 @@ describe('POST /api/v1/user/login', () => {
             password: 'password123'
         };
         // Send a POST request to the login endpoint with invalid email
-        const response = yield (0, supertest_1.default)(app_1.app)
+        const response = yield request(app)
             .post('/api/v1/user/login')
             .send(userData);
         // Expect status code 401
@@ -50,10 +46,10 @@ describe('POST /api/v1/user/login', () => {
     it('should return 401 for invalid password', () => __awaiter(void 0, void 0, void 0, function* () {
         const userData = {
             email: 'example@example.com',
-            password: 'invalidpassword' // Assuming this password is incorrect
+            password: 'invalidpassword' // 
         };
         // Send a POST request to the login endpoint with invalid password
-        const response = yield (0, supertest_1.default)(app_1.app)
+        const response = yield request(app)
             .post('/api/v1/user/login')
             .send(userData);
         // Expect status code 401
@@ -76,7 +72,7 @@ describe('POST /api/v1/user/login', () => {
             }
         }));
         // Send a POST request to the login endpoint
-        const response = yield (0, supertest_1.default)(app_1.app)
+        const response = yield request(app)
             .post('/api/v1/user/login')
             .send(userData);
         // Expect status code 500
