@@ -7,7 +7,7 @@
   "description": "",
   "main": "dist/app.js",
   "scripts": {
-    "prebuild": "npm install --force",
+    "prebuild": "npm install",
     "start": "node dist/app.js"
   },
   "author": "",
