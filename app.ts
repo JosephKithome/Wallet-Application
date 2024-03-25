@@ -761,7 +761,7 @@ app.post('/api/v1/currency', async (req: Request, resp: Response) => {
             return resp.status(400).json({ error: 'Name, code and country cannot be empty' });
         }
         // check if the currency exists
-        const currency = await Currency.findOne({ code });
+        const currency = await Currency.findOne({ code: code });
         if (currency) {
             return resp.status(400).json({ error: 'Currency already exists' });
         }
