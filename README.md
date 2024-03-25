@@ -40,6 +40,9 @@ To start using the Wallet Management System, follow these steps:
 - **Description**: Registers a new user in the system.
 - **Request Body**:
   - `email`: User's email address.
+  - `username`: User's username.
+  - `firstName`: User's first name.
+  - `lastName`: User's last name.
   - `password`: User's password.
 - **Response**:
   - `200 OK`: User registered successfully.
