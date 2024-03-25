@@ -25,11 +25,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
 app.get('/', (req: Request, res: Response) => {
-    res.send('Hello World!');
+    res.send('Welcome to Wallet Application');
 });
 
 // Register endpoint
-app.post("/api/user/signup", async (req: Request, resp: Response) => {
+app.post("/api/v1/user/signup", async (req: Request, resp: Response) => {
     try {
         const userData = req.body;
         const user = new User(userData);
@@ -56,7 +56,7 @@ app.post("/api/user/signup", async (req: Request, resp: Response) => {
 });
 
 // Login endpoint
-app.post("/api/user/login", (req: Request, resp: Response) => {
+app.post("/api/v1/user/login", (req: Request, resp: Response) => {
     const userData = req.body;
 
     User.findOne({ email: userData.email })
@@ -82,7 +82,7 @@ app.post("/api/user/login", (req: Request, resp: Response) => {
 });
 
 //Get user details by user ID
-app.get('/api/user/:userId', async (req, resp) => {
+app.get('/api/v1/user/:userId', async (req, resp) => {
     const userId = req.params.userId;
     try {
         // Check if the authorization header is missing
@@ -125,7 +125,7 @@ app.get('/api/user/:userId', async (req, resp) => {
 });
 
 // update user profile
-app.put('/api/user/:userId', async (req, resp) => {
+app.put('/api/v1/user/:userId', async (req, resp) => {
     const userId = req.params.userId;
     const userData = req.body;
     try {
@@ -231,7 +231,7 @@ app.post('/api/v1/wallet', async (req: Request, resp: Response) => {
     }
 });
 
-app.post('/wallet/credit', async (req: Request, resp: Response) => {
+app.post('/api/v1/wallet/credit', async (req: Request, resp: Response) => {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -295,7 +295,7 @@ app.post('/wallet/credit', async (req: Request, resp: Response) => {
     }
 });
 
-app.get('/wallet/balance', async (req: Request, resp: Response) => {
+app.get('api/v1/wallet/balance', async (req: Request, resp: Response) => {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -339,7 +339,7 @@ app.get('/wallet/balance', async (req: Request, resp: Response) => {
     }
 });
 
-app.post('/wallet/debit', async (req: Request, resp: Response) => {
+app.post('qpi/v1/wallet/debit', async (req: Request, resp: Response) => {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -429,7 +429,7 @@ app.post('/wallet/debit', async (req: Request, resp: Response) => {
 
 
 // Define route for sending funds
-app.post('/api/transaction/send', async (req, resp) => {
+app.post('/api/v1/transaction/send', async (req, resp) => {
     const { amount, receiverAccountNumber } = req.body;
     try {
         // Check if the authorization header is missing
@@ -496,6 +496,7 @@ app.post('/api/transaction/send', async (req, resp) => {
             receiverId: receiver.userId,
             amount: amount,
             walletAccountNumber: wallet.walletAccountNumber,
+            name: wallet.name,
             type: 'debit',
         });
         await transaction.save();
@@ -505,6 +506,7 @@ app.post('/api/transaction/send', async (req, resp) => {
             receiverId: wallet.userId,
             amount: amount,
             walletAccountNumber: receiver.walletAccountNumber,
+            name: receiver.name,
             type: 'credit',
         });
         await tr.save();
@@ -519,7 +521,7 @@ app.post('/api/transaction/send', async (req, resp) => {
 });
 
 // Define route for withdrawing funds from user's wallet
-app.post('/api/user/:userId/wallet/withdraw', async (req, resp) => {
+app.post('/api/v1/user/:userId/wallet/withdraw', async (req, resp) => {
     const { amount } = req.body;
     try {
 
@@ -553,6 +555,9 @@ app.post('/api/user/:userId/wallet/withdraw', async (req, resp) => {
         // Extract userId from payload
         const userId = payload.subject;
 
+        console.log("USERID", userId)
+        console.log("USER", req.params.userId)
+
         if (userId !== req.params.userId) {
             return resp.status(404).json({ message: 'You can only withdraw from your own account' });
         }
@@ -579,7 +584,7 @@ app.post('/api/user/:userId/wallet/withdraw', async (req, resp) => {
 });
 
 // Define route for getting transaction history for user's wallet
-app.get('/api/users/:userId/wallet/transactions', async (req, resp) => {
+app.get('/api/v1/user/:userId/wallet/transactions', async (req, resp) => {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -622,7 +627,7 @@ app.get('/api/users/:userId/wallet/transactions', async (req, resp) => {
 });
 
 // Define the route
-app.get('/api/transaction/wallet/:walletId', async (req, resp) => {
+app.get('/api/v1/ransaction/wallet/:walletId', async (req, resp) => {
     try {
 
         // Check if the authorization header is missing

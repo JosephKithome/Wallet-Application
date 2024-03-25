@@ -29,10 +29,10 @@ exports.app.use(body_parser_1.default.json());
 exports.app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.swaggerDocument));
 // Routes
 exports.app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('Welcome to Wallet Application');
 });
 // Register endpoint
-exports.app.post("/api/user/signup", (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.post("/api/v1/user/signup", (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userData = req.body;
         const user = new schema_1.User(userData);
@@ -57,7 +57,7 @@ exports.app.post("/api/user/signup", (req, resp) => __awaiter(void 0, void 0, vo
     }
 }));
 // Login endpoint
-exports.app.post("/api/user/login", (req, resp) => {
+exports.app.post("/api/v1/user/login", (req, resp) => {
     const userData = req.body;
     schema_1.User.findOne({ email: userData.email })
         .then((dbUser) => {
@@ -79,7 +79,7 @@ exports.app.post("/api/user/login", (req, resp) => {
     });
 });
 //Get user details by user ID
-exports.app.get('/api/user/:userId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.get('/api/v1/user/:userId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.userId;
     try {
         // Check if the authorization header is missing
@@ -116,7 +116,7 @@ exports.app.get('/api/user/:userId', (req, resp) => __awaiter(void 0, void 0, vo
     }
 }));
 // update user profile
-exports.app.put('/api/user/:userId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.put('/api/v1/user/:userId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.userId;
     const userData = req.body;
     try {
@@ -206,7 +206,7 @@ exports.app.post('/api/v1/wallet', (req, resp) => __awaiter(void 0, void 0, void
         resp.status(500).json({ error: 'An unexpected error occurred' });
     }
 }));
-exports.app.post('/wallet/credit', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.post('/api/v1/wallet/credit', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -260,7 +260,7 @@ exports.app.post('/wallet/credit', (req, resp) => __awaiter(void 0, void 0, void
         resp.status(500).json({ error: 'An unexpected error occurred' });
     }
 }));
-exports.app.get('/wallet/balance', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.get('api/v1/wallet/balance', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -298,7 +298,7 @@ exports.app.get('/wallet/balance', (req, resp) => __awaiter(void 0, void 0, void
         resp.status(500).json({ error: 'An unexpected error occurred' });
     }
 }));
-exports.app.post('/wallet/debit', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.post('qpi/v1/wallet/debit', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -372,7 +372,7 @@ exports.app.post('/wallet/debit', (req, resp) => __awaiter(void 0, void 0, void 
     }
 }));
 // Define route for sending funds
-exports.app.post('/api/transaction/send', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.post('/api/v1/transaction/send', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     const { amount, receiverAccountNumber } = req.body;
     try {
         // Check if the authorization header is missing
@@ -429,6 +429,7 @@ exports.app.post('/api/transaction/send', (req, resp) => __awaiter(void 0, void 
             receiverId: receiver.userId,
             amount: amount,
             walletAccountNumber: wallet.walletAccountNumber,
+            name: wallet.name,
             type: 'debit',
         });
         yield transaction.save();
@@ -437,6 +438,7 @@ exports.app.post('/api/transaction/send', (req, resp) => __awaiter(void 0, void 
             receiverId: wallet.userId,
             amount: amount,
             walletAccountNumber: receiver.walletAccountNumber,
+            name: receiver.name,
             type: 'credit',
         });
         yield tr.save();
@@ -449,7 +451,7 @@ exports.app.post('/api/transaction/send', (req, resp) => __awaiter(void 0, void 
     }
 }));
 // Define route for withdrawing funds from user's wallet
-exports.app.post('/api/user/:userId/wallet/withdraw', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.post('/api/v1/user/:userId/wallet/withdraw', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     const { amount } = req.body;
     try {
         // Check if the authorization header is missing
@@ -476,6 +478,8 @@ exports.app.post('/api/user/:userId/wallet/withdraw', (req, resp) => __awaiter(v
         }
         // Extract userId from payload
         const userId = payload.subject;
+        console.log("USERID", userId);
+        console.log("USER", req.params.userId);
         if (userId !== req.params.userId) {
             return resp.status(404).json({ message: 'You can only withdraw from your own account' });
         }
@@ -499,7 +503,7 @@ exports.app.post('/api/user/:userId/wallet/withdraw', (req, resp) => __awaiter(v
     }
 }));
 // Define route for getting transaction history for user's wallet
-exports.app.get('/api/users/:userId/wallet/transactions', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.get('/api/v1/user/:userId/wallet/transactions', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
@@ -537,7 +541,7 @@ exports.app.get('/api/users/:userId/wallet/transactions', (req, resp) => __await
     }
 }));
 // Define the route
-exports.app.get('/api/transaction/wallet/:walletId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
+exports.app.get('/api/v1/ransaction/wallet/:walletId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if the authorization header is missing
         if (!req.headers.authorization) {
