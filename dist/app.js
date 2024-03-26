@@ -521,7 +521,7 @@ exports.app.post('/api/v1/user/:userId/wallet/withdraw', (req, resp) => __awaite
         // Extract userId from payload
         const userId = payload.subject;
         // validate if amount was provided
-        if (amount === null || amount === undefined) {
+        if (amount === null || amount === undefined || amount > 0) {
             return resp.status(400).json({ error: 'Amount cannot be empty' });
         }
         if (userId !== req.params.userId) {

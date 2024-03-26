@@ -603,7 +603,7 @@ app.post('/api/v1/user/:userId/wallet/withdraw', async (req, resp) => {
         const userId = payload.subject;
 
         // validate if amount was provided
-        if (amount === null || amount === undefined) {
+        if (amount === null || amount === undefined || amount > 0) {
             return resp.status(400).json({ error: 'Amount cannot be empty' });
         }
 
