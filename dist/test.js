@@ -46,7 +46,7 @@ describe('POST /api/v1/user/login', () => {
     it('should return 401 for invalid password', () => __awaiter(void 0, void 0, void 0, function* () {
         const userData = {
             email: 'example@example.com',
-            password: 'invalidpassword' // 
+            password: 'invalidpassword' // Assuming this password is incorrect
         };
         // Send a POST request to the login endpoint with invalid password
         const response = yield request(app)
