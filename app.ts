@@ -1,3 +1,4 @@
+import { sendSMSNotification } from './integrations/sms';
 import express, { Application, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import jwt, { JwtPayload } from 'jsonwebtoken';
@@ -6,6 +7,7 @@ import { dbConection } from './database/mongoConnector';
 import {
     BankAccount,
     Currency,
+    Notification,
     Transaction,
     User,
     Wallet
@@ -546,6 +548,17 @@ app.post('/api/v1/transaction/send', async (req, resp) => {
             name: wallet.name,
             type: 'debit',
         });
+        // send notification
+        const  message = new Notification({
+            userId: wallet.userId,
+            message: `Confirmed ${amount} Kes  send to ${receiver.walletAccountNumber} ${wallet.name} on ${new Date()}`,
+            timestamp: new Date()
+
+        })
+        await message.save();
+
+        sendSMSNotification("254717064174", message.message);
+
         await transaction.save();
 
         const tr = new Transaction({
@@ -559,6 +572,16 @@ app.post('/api/v1/transaction/send', async (req, resp) => {
         await tr.save();
 
         //Trigger Notification here
+         // send notification
+         const  msg = new Notification({
+            userId: wallet.userId,
+            message: `You have received ${amount} from ${receiver.walletAccountNumber}`,
+            timestamp: new Date()
+
+        })
+        await msg.save();
+
+        sendSMSNotification("254717064174", msg.message);
 
         resp.json({ message: 'Funds sent successfully', newBalance: wallet.balance });
     } catch (error) {

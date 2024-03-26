@@ -3,6 +3,9 @@
         "SECRET_KEY":"lkNZpZGoRijbHU0jQMbD5UfUln0svjiG",
         "MONGO_USER": "blackberry",
         "MONGO_PASSWORD": "6NRlEX0xkOj0lXEa",
-        "MONGO_URI": "mongodb+srv://blackberry:6NRlEX0xkOj0lXEa@vibewire.uze1ulu.mongodb.net/?retryWrites=true&w=majority&appName=vibewire"
+        "MONGO_URI": "mongodb+srv://blackberry:6NRlEX0xkOj0lXEa@vibewire.uze1ulu.mongodb.net/?retryWrites=true&w=majority&appName=vibewire",
+        "AFRICASTALKING_API_KEY": "7939b28e516de23ba8224d2393bacdd7003128b6457c9df44928e455fa0df7a5",
+        "AFRICASTALKING_URL":"https://api.africastalking.com/version1/messaging",
+        "AFRICASTALKING_USERNAME": "bulbytech"
     }
 }

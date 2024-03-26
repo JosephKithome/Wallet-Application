@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
+const sms_1 = require("./integrations/sms");
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -474,6 +475,14 @@ exports.app.post('/api/v1/transaction/send', (req, resp) => __awaiter(void 0, vo
             name: wallet.name,
             type: 'debit',
         });
+        // send notification
+        const message = new schema_1.Notification({
+            userId: wallet.userId,
+            message: `Confirmed ${amount} Kes  send to ${receiver.walletAccountNumber} ${wallet.name} on ${new Date()}`,
+            timestamp: new Date()
+        });
+        yield message.save();
+        (0, sms_1.sendSMSNotification)("254717064174", message.message);
         yield transaction.save();
         const tr = new schema_1.Transaction({
             senderId: receiver.userId,
@@ -485,6 +494,14 @@ exports.app.post('/api/v1/transaction/send', (req, resp) => __awaiter(void 0, vo
         });
         yield tr.save();
         //Trigger Notification here
+        // send notification
+        const msg = new schema_1.Notification({
+            userId: wallet.userId,
+            message: `You have received ${amount} from ${receiver.walletAccountNumber}`,
+            timestamp: new Date()
+        });
+        yield msg.save();
+        (0, sms_1.sendSMSNotification)("254717064174", msg.message);
         resp.json({ message: 'Funds sent successfully', newBalance: wallet.balance });
     }
     catch (error) {
