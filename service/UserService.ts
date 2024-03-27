@@ -74,7 +74,7 @@ class UserService {
             return { success: true, updatedUser };
         } catch (error) {
             console.error('Error updating user profile:', error);
-            throw new Error("Internal server error");
+            return { success: false, error: "Error updating user profile" };
         }
     }
 }

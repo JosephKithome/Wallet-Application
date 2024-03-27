@@ -14,78 +14,77 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const schema_1 = require("../models/schema");
-class UserService {
-    getUserById(userId, token) {
+class CurrencyService {
+    createCurrency(req) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
-                // Check if the token is null or missing
-                if (!token || token === "null") {
-                    return { success: false, error: "Unauthorized" };
+                const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
+                if (!token) {
+                    return { success: false, error: "Unauthorized request!!" };
                 }
                 let payload;
                 try {
-                    // Verify the token
                     payload = jsonwebtoken_1.default.verify(token, `${process.env.SECRET_KEY}`);
                 }
                 catch (error) {
                     return { success: false, error: "Unauthorized" };
                 }
-                // Check if payload is valid
                 if (!payload || typeof payload === 'string') {
                     return { success: false, error: "Unauthorized" };
                 }
-                // Validate if user ID was provided
-                if (!userId) {
-                    return { success: false, error: "Please provide a valid user ID" };
+                const userId = payload.subject;
+                const { name, code, country } = req.body;
+                if (!name || !code || !country) {
+                    return { success: false, error: 'Name, code, and country cannot be empty' };
                 }
-                // Find user by ID
-                const user = yield schema_1.User.findById(userId);
-                if (!user) {
-                    return { success: false, error: "User not found" };
+                const existingCurrency = yield schema_1.Currency.findOne({ code: code });
+                if (existingCurrency) {
+                    return { success: false, error: 'Currency already exists' };
                 }
-                return { success: true, user };
+                const newCurrency = new schema_1.Currency({
+                    name: name,
+                    code: code,
+                    country: country
+                });
+                yield newCurrency.save();
+                return { success: true, currency: newCurrency };
             }
             catch (error) {
-                console.error('Error fetching user:', error);
-                throw new Error("Internal server error");
+                console.error('Error creating currency:', error);
+                throw new Error("An unexpected error occurred");
             }
         });
     }
-    updateUserProfile(userId, userData, token) {
+    getCurrencies(req) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
-                // Check if the token is null or missing
-                if (!token || token === "null") {
-                    return { success: false, error: "Unauthorized" };
+                const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
+                if (!token) {
+                    return { success: false, error: "Unauthorized request!!" };
                 }
                 let payload;
                 try {
-                    // Verify the token
                     payload = jsonwebtoken_1.default.verify(token, `${process.env.SECRET_KEY}`);
                 }
                 catch (error) {
                     return { success: false, error: "Unauthorized" };
                 }
-                // Check if payload is valid
                 if (!payload || typeof payload === 'string') {
                     return { success: false, error: "Unauthorized" };
                 }
-                // Validate if user ID was provided
-                if (!userId) {
-                    return { success: false, error: "Please provide a valid user ID" };
-                }
-                // Find user by ID and update
-                const updatedUser = yield schema_1.User.findByIdAndUpdate(userId, userData, { new: true });
-                if (!updatedUser) {
-                    return { success: false, error: "User not found" };
-                }
-                return { success: true, updatedUser };
+                // Extract userId from payload
+                const userId = payload.subject;
+                // Query the database to find all currencies
+                const currencies = yield schema_1.Currency.find();
+                return { success: true, currencies };
             }
             catch (error) {
-                console.error('Error updating user profile:', error);
-                return { success: false, error: "Error updating user profile" };
+                console.error('Error fetching currencies:', error);
+                throw new Error("An unexpected error occurred");
             }
         });
     }
 }
-exports.default = UserService;
+exports.default = CurrencyService;
