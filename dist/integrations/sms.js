@@ -15,12 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendSMSNotification = void 0;
 const axios_1 = __importDefault(require("axios"));
 const sendSMSNotification = (to, text) => __awaiter(void 0, void 0, void 0, function* () {
-    const AFRICASTALKING_API_KEY = "7939b28e516de23ba8224d2393bacdd7003128b6457c9df44928e455fa0df7a5";
-    const AFRICASTALKING_URL = "https://api.africastalking.com/version1/messaging";
-    const AFRICASTALKING_USERNAME = "bulbytech";
-    const apikey = AFRICASTALKING_API_KEY;
-    const url = AFRICASTALKING_URL;
-    const username = AFRICASTALKING_USERNAME;
+    const apikey = process.env.TZAFRICASTALKING_API_KEY || "";
+    const url = process.env.AFRICASTALKING_URL || "";
+    const username = process.env.AFRICASTALKING_USERNAME || "";
     console.log("USERNAME", username);
     try {
         const headers = {
