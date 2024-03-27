@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import WalletService from '../../service/WalletService';
+import WalletService from '../../services/WalletService';
 
 export class WalletControlller {
     async createWallet(req: Request, resp: Response) {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import TransactionService from '../../service/TransactionsService';
+import TransactionService from '../../services/TransactionsService';
 
 export class TransactionController {
     async sendFunds(req: Request, resp: Response) {

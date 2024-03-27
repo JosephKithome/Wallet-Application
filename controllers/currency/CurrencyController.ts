@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import CurrencyService from '../../service/CurrencyService';
+import CurrencyService from '../../services/CurrencyService';
 
 export class CurrencyController {
     async createCurrency(req: Request, resp: Response) {
