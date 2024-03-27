@@ -20,6 +20,9 @@ import {
     getWalletExpiryDate
 } from './utils/utils';
 
+import { AuthController } from './controllers/auth/AuthController';
+import { UserController } from './controllers/user/UserController';
+
 export const app: Application = express();
 
 // Middleware
@@ -33,175 +36,15 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to Wallet Application');
 });
 
-// Register endpoint
-app.post("/api/v1/user/signup", async (req: Request, resp: Response) => {
-    try {
-        const userData = req.body;
-        // validate the incoming user data
-        if (userData.username !== undefined || userData.email === "") {
-            return resp.status(400).json({ error: 'Please provide a valid username' });
-        }
-        if (userData.password === "") {
-            return resp.status(400).json({ error: 'Please provide a valid password' });
-        }
-        if (userData.password.length < 8) {
-            return resp.status(400).json({ error: 'Password must be at least 8 characters long' });
-        }
-        if (userData.firstName == null || userData.firstName == undefined) {
-            return resp.status(400).json({ error: 'Please provide a valid first and last name' });
-        }
-        if (userData.lastName == null || userData.lastName == undefined) {
-            return resp.status(400).json({ error: 'Please provide a valid first and last name' });
-        }
-        if (userData.phone == null || userData.phone == undefined) {
-            return resp.status(400).json({ error: 'Please provide a valid phone number' });
-        }
-        // check if user already exists
-        const existingUser = await User.findOne({ email: userData.email });
-        if (existingUser) {
-            return resp.status(400).json({ error: 'User already exists' });
-        }
-        const user = new User(userData);
-        const hashedPassword = await bcrypt.hash(userData.password, 12);
-        user.password = hashedPassword
-        const registeredUser = await user.save();
+const authController = new AuthController();
+const userController = new UserController();
 
-        // Generate a token for the user
-        const payload = { subject: registeredUser._id };
-        const token = jwt.sign(payload, 'secretkey');
-        if (token !== "") {
-            resp.status(200).json({ message: 'User registered successfully' });
-        }
-    } catch (error) {
-        console.error(error);
-        resp.status(500).send("Error occurred while registering user.");
-    }
-});
 
-// Login endpoint
-app.post("/api/v1/user/login", (req: Request, resp: Response) => {
-    const userData = req.body;
+app.post("/api/v1/user/signup", authController.signUp);
+app.post("/api/v1/user/login", authController.login);
+app.get('/api/v1/user/:userId', userController.getUserById);
+app.put('/api/v1/user/:userId', userController.updateUserProfile);
 
-    //validate the  data
-    if (userData.email === "" || userData.password === "") {
-        return resp.status(400).json({ error: 'Please provide a valid email and password' });
-    }
-    if (userData.password.length < 8) {
-        return resp.status(400).json({ error: 'Password must be at least 8 characters long' });
-    }
-    User.findOne({ email: userData.email })
-        .then((dbUser: any) => {
-            if (!dbUser) {
-                resp.status(401).send("Invalid Email");
-                return;
-            }
-
-            if (dbUser.password !== userData.password) {
-                resp.status(401).send("Invalid password");
-                return;
-            }
-
-            const payload = { subject: dbUser._id };
-            const token = jwt.sign(payload, `${process.env.SECRET_KEY}`);
-            resp.status(200).send({ token });
-        })
-        .catch((error: any) => {
-            console.log(error);
-            resp.status(500).send("Internal Server Error");
-        });
-});
-
-//Get user details by user ID
-app.get('/api/v1/user/:userId', async (req, resp) => {
-    const userId = req.params.userId;
-    try {
-        // Check if the authorization header is missing
-        if (!req.headers.authorization) {
-            return resp.status(401).send("Unauthorized request!!");
-        }
-
-        // Extract token from the authorization header
-        const token = req.headers.authorization.split(' ')[1];
-
-        // Check if the token is null
-        if (token === "null") {
-            return resp.status(401).send("Unauthorized");
-        }
-
-        let payload: string | JwtPayload;
-
-        try {
-            // Verify the token
-            payload = jwt.verify(token, `${process.env.SECRET_KEY}`) as JwtPayload;
-        } catch (error) {
-            return resp.status(401).send("Unauthorized");
-        }
-
-        // Check if payload is valid
-        if (!payload || typeof payload === 'string') {
-            return resp.status(401).send("Unauthorized");
-        }
-
-        // validate if user Id was provided
-        if (userId == null || userId == undefined) {
-            return resp.status(400).json({ error: 'Please provide a valid user ID' });
-        }
-
-        const user = await User.findById({ _id: userId });
-        if (!user) {
-            return resp.status(404).json({ message: 'User not found' });
-        }
-        resp.json(user);
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        resp.status(500).json({ message: 'Internal server error' });
-    }
-
-});
-
-// update user profile
-app.put('/api/v1/user/:userId', async (req, resp) => {
-    const userId = req.params.userId;
-    const userData = req.body;
-    try {
-        // Check if the authorization header is missing
-        if (!req.headers.authorization) {
-            return resp.status(401).send("Unauthorized request!!");
-        }
-
-        // Extract token from the authorization header
-        const token = req.headers.authorization.split(' ')[1];
-
-        // Check if the token is null
-        if (token === "null") {
-            return resp.status(401).send("Unauthorized");
-        }
-
-        let payload: string | JwtPayload;
-
-        try {
-            // Verify the token
-            payload = jwt.verify(token, `${process.env.SECRET_KEY}`) as JwtPayload;
-        } catch (error) {
-            return resp.status(401).send("Unauthorized");
-        }
-
-        // Check if payload is valid
-        if (!payload || typeof payload === 'string') {
-            return resp.status(401).send("Unauthorized");
-        }
-
-        const updatedUser = await User.findByIdAndUpdate(userId, userData, { new: true });
-        if (!updatedUser) {
-            return resp.status(404).json({ message: 'User not found' });
-        }
-        resp.json(updatedUser);
-    } catch (error) {
-        console.error('Error updating user profile:', error);
-        resp.status(500).json({ message: 'Internal server error' });
-    }
-
-});
 // Create Wallet account
 app.post('/api/v1/wallet', async (req: Request, resp: Response) => {
 
@@ -549,7 +392,7 @@ app.post('/api/v1/transaction/send', async (req, resp) => {
             type: 'debit',
         });
         // send notification
-        const  message = new Notification({
+        const message = new Notification({
             userId: wallet.userId,
             message: `Confirmed ${amount} Kes  send to ${receiver.walletAccountNumber} ${wallet.name} on ${new Date()}`,
             timestamp: new Date()
@@ -572,8 +415,8 @@ app.post('/api/v1/transaction/send', async (req, resp) => {
         await tr.save();
 
         //Trigger Notification here
-         // send notification
-         const  msg = new Notification({
+        // send notification
+        const msg = new Notification({
             userId: wallet.userId,
             message: `You have received ${amount} from ${receiver.walletAccountNumber}`,
             timestamp: new Date()
@@ -780,7 +623,7 @@ app.post('/api/v1/currency', async (req: Request, resp: Response) => {
         const userId = payload.subject;
 
         // validate the incoming data
-        if (!name ||!code ||!country) {
+        if (!name || !code || !country) {
             return resp.status(400).json({ error: 'Name, code and country cannot be empty' });
         }
         // check if the currency exists
@@ -840,7 +683,7 @@ app.get('/api/v1/currency', async (req: Request, resp: Response) => {
         // Query the database to find all currencies
         const currencies = await Currency.find();
         // Send the list of currencies as the HTTP response
-        resp.status(200).json({message: 'Success', currencies });
+        resp.status(200).json({ message: 'Success', currencies });
     } catch (error) {
         console.error('Error creating currency:', error);
         resp.status(500).json({ error: 'An unexpected error occurred' });

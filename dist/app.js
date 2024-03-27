@@ -21,8 +21,9 @@ const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const mongoConnector_1 = require("./database/mongoConnector");
 const schema_1 = require("./models/schema");
 const swagger_1 = require("./documentation/swagger");
-const bcrypt_1 = __importDefault(require("bcrypt"));
 const utils_1 = require("./utils/utils");
+const AuthController_1 = require("./controllers/auth/AuthController");
+const UserController_1 = require("./controllers/user/UserController");
 exports.app = (0, express_1.default)();
 // Middleware
 exports.app.use(body_parser_1.default.json());
@@ -32,158 +33,12 @@ exports.app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_expr
 exports.app.get('/', (req, res) => {
     res.send('Welcome to Wallet Application');
 });
-// Register endpoint
-exports.app.post("/api/v1/user/signup", (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userData = req.body;
-        // validate the incoming user data
-        if (userData.username !== undefined || userData.email === "") {
-            return resp.status(400).json({ error: 'Please provide a valid username' });
-        }
-        if (userData.password === "") {
-            return resp.status(400).json({ error: 'Please provide a valid password' });
-        }
-        if (userData.password.length < 8) {
-            return resp.status(400).json({ error: 'Password must be at least 8 characters long' });
-        }
-        if (userData.firstName == null || userData.firstName == undefined) {
-            return resp.status(400).json({ error: 'Please provide a valid first and last name' });
-        }
-        if (userData.lastName == null || userData.lastName == undefined) {
-            return resp.status(400).json({ error: 'Please provide a valid first and last name' });
-        }
-        if (userData.phone == null || userData.phone == undefined) {
-            return resp.status(400).json({ error: 'Please provide a valid phone number' });
-        }
-        // check if user already exists
-        const existingUser = yield schema_1.User.findOne({ email: userData.email });
-        if (existingUser) {
-            return resp.status(400).json({ error: 'User already exists' });
-        }
-        const user = new schema_1.User(userData);
-        const hashedPassword = yield bcrypt_1.default.hash(userData.password, 12);
-        user.password = hashedPassword;
-        const registeredUser = yield user.save();
-        // Generate a token for the user
-        const payload = { subject: registeredUser._id };
-        const token = jsonwebtoken_1.default.sign(payload, 'secretkey');
-        if (token !== "") {
-            resp.status(200).json({ message: 'User registered successfully' });
-        }
-    }
-    catch (error) {
-        console.error(error);
-        resp.status(500).send("Error occurred while registering user.");
-    }
-}));
-// Login endpoint
-exports.app.post("/api/v1/user/login", (req, resp) => {
-    const userData = req.body;
-    //validate the  data
-    if (userData.email === "" || userData.password === "") {
-        return resp.status(400).json({ error: 'Please provide a valid email and password' });
-    }
-    if (userData.password.length < 8) {
-        return resp.status(400).json({ error: 'Password must be at least 8 characters long' });
-    }
-    schema_1.User.findOne({ email: userData.email })
-        .then((dbUser) => {
-        if (!dbUser) {
-            resp.status(401).send("Invalid Email");
-            return;
-        }
-        if (dbUser.password !== userData.password) {
-            resp.status(401).send("Invalid password");
-            return;
-        }
-        const payload = { subject: dbUser._id };
-        const token = jsonwebtoken_1.default.sign(payload, `${process.env.SECRET_KEY}`);
-        resp.status(200).send({ token });
-    })
-        .catch((error) => {
-        console.log(error);
-        resp.status(500).send("Internal Server Error");
-    });
-});
-//Get user details by user ID
-exports.app.get('/api/v1/user/:userId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.userId;
-    try {
-        // Check if the authorization header is missing
-        if (!req.headers.authorization) {
-            return resp.status(401).send("Unauthorized request!!");
-        }
-        // Extract token from the authorization header
-        const token = req.headers.authorization.split(' ')[1];
-        // Check if the token is null
-        if (token === "null") {
-            return resp.status(401).send("Unauthorized");
-        }
-        let payload;
-        try {
-            // Verify the token
-            payload = jsonwebtoken_1.default.verify(token, `${process.env.SECRET_KEY}`);
-        }
-        catch (error) {
-            return resp.status(401).send("Unauthorized");
-        }
-        // Check if payload is valid
-        if (!payload || typeof payload === 'string') {
-            return resp.status(401).send("Unauthorized");
-        }
-        // validate if user Id was provided
-        if (userId == null || userId == undefined) {
-            return resp.status(400).json({ error: 'Please provide a valid user ID' });
-        }
-        const user = yield schema_1.User.findById({ _id: userId });
-        if (!user) {
-            return resp.status(404).json({ message: 'User not found' });
-        }
-        resp.json(user);
-    }
-    catch (error) {
-        console.error('Error fetching user:', error);
-        resp.status(500).json({ message: 'Internal server error' });
-    }
-}));
-// update user profile
-exports.app.put('/api/v1/user/:userId', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.userId;
-    const userData = req.body;
-    try {
-        // Check if the authorization header is missing
-        if (!req.headers.authorization) {
-            return resp.status(401).send("Unauthorized request!!");
-        }
-        // Extract token from the authorization header
-        const token = req.headers.authorization.split(' ')[1];
-        // Check if the token is null
-        if (token === "null") {
-            return resp.status(401).send("Unauthorized");
-        }
-        let payload;
-        try {
-            // Verify the token
-            payload = jsonwebtoken_1.default.verify(token, `${process.env.SECRET_KEY}`);
-        }
-        catch (error) {
-            return resp.status(401).send("Unauthorized");
-        }
-        // Check if payload is valid
-        if (!payload || typeof payload === 'string') {
-            return resp.status(401).send("Unauthorized");
-        }
-        const updatedUser = yield schema_1.User.findByIdAndUpdate(userId, userData, { new: true });
-        if (!updatedUser) {
-            return resp.status(404).json({ message: 'User not found' });
-        }
-        resp.json(updatedUser);
-    }
-    catch (error) {
-        console.error('Error updating user profile:', error);
-        resp.status(500).json({ message: 'Internal server error' });
-    }
-}));
+const authController = new AuthController_1.AuthController();
+const userController = new UserController_1.UserController();
+exports.app.post("/api/v1/user/signup", authController.signUp);
+exports.app.post("/api/v1/user/login", authController.login);
+exports.app.get('/api/v1/user/:userId', userController.getUserById);
+exports.app.put('/api/v1/user/:userId', userController.updateUserProfile);
 // Create Wallet account
 exports.app.post('/api/v1/wallet', (req, resp) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = req.body;
