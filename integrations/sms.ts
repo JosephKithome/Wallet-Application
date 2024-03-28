@@ -2,7 +2,7 @@ import axios from 'axios';
 
      export const sendSMSNotification =async (to: string, text: string): Promise<any>=> {
 
-        const apikey = process.env.TZAFRICASTALKING_API_KEY || ""
+        const apikey = process.env.AFRICASTALKING_API_KEY || ""
         const url = process.env.AFRICASTALKING_URL || ""
         const username =process.env.AFRICASTALKING_USERNAME || ""
         console.log("USERNAME", username)

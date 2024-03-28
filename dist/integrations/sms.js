@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendSMSNotification = void 0;
 const axios_1 = __importDefault(require("axios"));
 const sendSMSNotification = (to, text) => __awaiter(void 0, void 0, void 0, function* () {
-    const apikey = process.env.TZAFRICASTALKING_API_KEY || "";
+    const apikey = process.env.AFRICASTALKING_API_KEY || "";
     const url = process.env.AFRICASTALKING_URL || "";
     const username = process.env.AFRICASTALKING_USERNAME || "";
     console.log("USERNAME", username);

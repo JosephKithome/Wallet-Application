@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CurrencyController = void 0;
-const CurrencyService_1 = __importDefault(require("../../service/CurrencyService"));
+const CurrencyService_1 = __importDefault(require("../../services/CurrencyService"));
 class CurrencyController {
     createCurrency(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {

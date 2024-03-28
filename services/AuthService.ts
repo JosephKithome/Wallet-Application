@@ -19,7 +19,7 @@ class AuthService {
             if (userData.firstName == null || userData.firstName == undefined || userData.lastName == null || userData.lastName == undefined) {
                 return { success: false, message: 'Please provide a valid first and last name' };
             }
-            if (userData.phone == null || userData.phone == undefined) {
+            if (userData.phone == "" || userData.phone == undefined) {
                 return { success: false, message: 'Please provide a valid phone number' };
             }
 
@@ -39,6 +39,7 @@ class AuthService {
 
             // Generate a token for the user
             const payload = { subject: registeredUser._id };
+            
             const token = jwt.sign(payload, 'secretkey');
 
             return { success: true, message: 'User registered successfully' };
@@ -71,7 +72,7 @@ class AuthService {
             }
 
             // Generate token
-            const payload = { subject: dbUser._id };
+            const payload = { subject: dbUser._id,  expiresAt: new Date(Date.now() + (1 * 60 * 60 * 1000))};
             const token = jwt.sign(payload, `${process.env.SECRET_KEY}`);
             return { success: true, token };
         } catch (error) {

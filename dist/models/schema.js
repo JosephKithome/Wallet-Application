@@ -39,6 +39,7 @@ const walletSchema = new mongoose_1.Schema({
     userId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
     balance: { type: Number, default: 0 },
     name: { type: String, required: false },
+    currecy: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Currency' }],
     transactions: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Transaction' }],
     walletAccountNumber: { type: String, required: true },
     openedAt: { type: Date, default: Date.now },
@@ -93,3 +94,6 @@ const currencySchema = new mongoose_1.Schema({
 // Create and export the Mongoose model
 exports.Currency = mongoose_1.default.model('Currency', currencySchema);
 /*****************************************End currency schema***************************************************************************** */
+// useful docs about  Mongo database
+// Insert Many
+// 1. We invoke insertMany() to insert many records at once in the database

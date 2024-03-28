@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { sendSMSNotification } from '../integrations/sms';
-import { Wallet, Notification, Transaction } from '../models/schema';
+import { Wallet, Notification, Transaction, Currency } from '../models/schema';
 import {
     accountNumberGenerator,
     generateRandomCVV,
@@ -12,8 +12,7 @@ class WalletService {
     async createWallet(walletData: any, token: string): Promise<{ success: boolean; wallet?: any; error?: string }> {
         try {
 
-            console.log("Database created", walletData)
-            const { name, openedAt, expiresAt, isSuspended, balance } = walletData.body;
+            const { name, openedAt, expiresAt, isSuspended, balance, currency } = walletData.body;
 
             // Check if the authorization header is missing
             if (!token || token === "null") {
@@ -38,7 +37,10 @@ class WalletService {
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
             }
-
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
+            }
             // Extract userId from payload
             const userId = payload.subject;
 
@@ -51,6 +53,11 @@ class WalletService {
             // Check if name is empty when creating a new wallet
             if (!name) {
                 return { success: false, error: "Name of the wallet cannot be empty" };
+            }
+            // check whether the currency provided exists 
+            const currencyExists = await Currency.findOne({ code: currency });
+            if (!currencyExists) {
+                return { success: false, error: "Currency not found" };
             }
 
             // check whether a wallet exists by the name provided
@@ -65,7 +72,8 @@ class WalletService {
                 name: name,
                 balance: 0,
                 walletAccountNumber: accountNumberGenerator(),
-                expiresAt: getWalletExpiryDate()
+                expiresAt: getWalletExpiryDate(),
+                currency: currencyExists._id
             });
             await newWallet.save();
 
@@ -94,6 +102,10 @@ class WalletService {
 
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
+            }
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
             }
 
             const userId = payload.subject;
@@ -144,6 +156,28 @@ class WalletService {
             });
             receiverTransaction.save();
 
+            // send notification
+            const message = new Notification({
+                userId: wallet.userId,
+                message: `Congratulations ${amount} Kes  credited  to ${receiver.walletAccountNumber} ${wallet.name} on ${new Date()}`,
+                timestamp: new Date()
+
+            })
+            await message.save();
+
+            sendSMSNotification("254717064174", message.message);
+
+              // send notification
+              const msg = new Notification({
+                userId: wallet.userId,
+                message: `Confirmed ${amount} Kes  debited  from ${wallet.walletAccountNumber} ${wallet.name} on ${new Date()}`,
+                timestamp: new Date()
+
+            })
+            await msg.save();
+
+            sendSMSNotification("254717064174", message.message);
+
             return { success: true, wallet };
         } catch (error) {
             console.error('Error debiting wallet:', error);
@@ -172,10 +206,14 @@ class WalletService {
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
             }
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
+            }
 
             const userId = payload.subject;
 
-            if (walletAccountNumber =="" || walletAccountNumber === undefined) {
+            if (walletAccountNumber == "" || walletAccountNumber === undefined) {
                 return { success: false, error: "Account number cannot be empty" };
             }
 
@@ -212,6 +250,10 @@ class WalletService {
                 payload = jwt.verify(token, `${process.env.SECRET_KEY}`);
             } catch (error) {
                 return { success: false, error: "Unauthorized" };
+            }
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
             }
 
             // Check if payload is valid
@@ -264,6 +306,10 @@ class WalletService {
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
             }
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
+            }
 
             // Extract userId from payload
             const userId = payload.subject;
@@ -287,7 +333,7 @@ class WalletService {
                 amount,
                 type: 'credit'
             });
-            
+
             transaction.save();
 
             // send notification
@@ -330,6 +376,10 @@ class WalletService {
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
             }
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
+            }
 
             const userId = payload.subject;
 
@@ -353,7 +403,7 @@ class WalletService {
 
             wallet.balance -= amount;
             await wallet.save();
-            
+
             // send notification
             const message = new Notification({
                 userId: wallet.userId,

@@ -26,6 +26,10 @@ class TransactionService {
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
             }
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
+            }
 
             const userId = payload.subject;
 

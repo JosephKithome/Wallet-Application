@@ -23,6 +23,11 @@ class CurrencyService {
                 return { success: false, error: "Unauthorized" };
             }
 
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
+            }
+
             const userId = payload.subject;
 
             const { name, code, country } = req.body;
@@ -71,6 +76,12 @@ class CurrencyService {
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
             }
+
+            // Check if the token has expired
+            if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
+            }
+
 
             // Extract userId from payload
             const userId = payload.subject;

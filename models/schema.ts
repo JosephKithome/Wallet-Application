@@ -32,17 +32,20 @@ export interface WalletDocument extends Document {
     userId: string;
     balance: number;
     name: string;
+    currency: mongoose.Types.ObjectId[];
     walletAccountNumber: string;
     openedAt: { type: Date, required: true },
     expiresAt: { type: Date, required: true },
     transactions: mongoose.Types.ObjectId[]; // References Transaction documents
     isSuspended: { type: boolean, default: false}
+
 }
 
 const walletSchema: Schema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     balance: { type: Number, default: 0 },
     name: {type: String, required: false},
+    currecy : [{ type: Schema.Types.ObjectId, ref: 'Currency' }],
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
     walletAccountNumber: { type: String, required: true },
     openedAt: { type: Date, default: Date.now },
@@ -176,4 +179,9 @@ const currencySchema: Schema<CurrencyDocument> = new Schema({
 export const Currency = mongoose.model<CurrencyDocument>('Currency', currencySchema);
 
 /*****************************************End currency schema***************************************************************************** */
+
+// useful docs about  Mongo database
+
+// Insert Many
+// 1. We invoke insertMany() to insert many records at once in the database
 

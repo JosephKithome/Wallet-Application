@@ -21,6 +21,10 @@ class UserService {
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
             }
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
+            }
 
             // Validate if user ID was provided
             if (!userId) {
@@ -58,6 +62,10 @@ class UserService {
             // Check if payload is valid
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
+            }
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
             }
 
             // Validate if user ID was provided

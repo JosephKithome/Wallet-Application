@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BankController = void 0;
-const BankServie_1 = __importDefault(require("../../service/BankServie"));
+const BankServie_1 = __importDefault(require("../../services/BankServie"));
 class BankController {
     createBankAccount(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
