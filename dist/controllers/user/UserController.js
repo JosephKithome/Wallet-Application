@@ -24,7 +24,7 @@ class UserController {
                 const userService = new UserService_1.default();
                 const result = yield userService.getUserById(userId, token || '');
                 if (result.success) {
-                    resp.json(result.user);
+                    resp.json(result.data);
                 }
                 else {
                     resp.status(401).json({ error: result.error });

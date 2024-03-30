@@ -11,7 +11,7 @@ export class UserController {
             const result = await userService.getUserById(userId, token || '');
 
             if (result.success) {
-                resp.json(result.user);
+                resp.json(result.data);
             } else {
                 resp.status(401).json({ error: result.error });
             }
