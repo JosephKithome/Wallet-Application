@@ -16,12 +16,15 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const sms_1 = require("../integrations/sms");
 const schema_1 = require("../models/schema");
 const utils_1 = require("./../utils/utils");
+const logger_1 = require("../utils/logger");
 class WalletService {
     constructor() {
         this.helper = new utils_1.WalletHelper();
+        this.logger = new logger_1.CustomLogger();
     }
     createWallet(walletData, token) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.logger.logInfo('createWallet payload: ' + JSON.stringify(walletData));
             try {
                 const { name, openedAt, expiresAt, isSuspended, balance, currency } = walletData.body;
                 // Check if the authorization header is missing
@@ -82,6 +85,7 @@ class WalletService {
                 return { success: true, wallet: newWallet };
             }
             catch (error) {
+                this.logger.logError('Error creating wallet:', error.message.toString());
                 return { success: false, error: "Error when creating a wallet" };
             }
         });
@@ -89,6 +93,7 @@ class WalletService {
     debitWallet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
+            this.logger.logInfo("debitWallet', req: " + req);
             try {
                 const { amount, walletAccountNumber } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
@@ -163,7 +168,7 @@ class WalletService {
                 return { success: true, wallet };
             }
             catch (error) {
-                console.error('Error debiting wallet:', error);
+                this.logger.logError('Error debiting wallet:', error.message.toString());
                 throw new Error("An unexpected error occurred");
             }
         });
@@ -171,6 +176,7 @@ class WalletService {
     getWalletBalance(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
+            this.logger.logInfo("getWalletBalance', req: " + req);
             try {
                 const { walletAccountNumber } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
@@ -202,12 +208,14 @@ class WalletService {
                 return { success: true, wallet };
             }
             catch (error) {
+                this.logger.logError('Error while getting wallet balance', error.messae.toString());
                 return { success: false, error: "An unexpected error occurred" };
             }
         });
     }
     getWalletByName(walletData, token) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.logger.logInfo("getWalletByName', walletData: " + walletData);
             try {
                 const { name } = walletData.body;
                 // Check if the authorization header is missing
@@ -247,12 +255,14 @@ class WalletService {
                 return { success: true, wallet: wallet };
             }
             catch (error) {
+                this.logger.logDebug('Error while creating', error.message.toString());
                 return { success: false, error: "Error retrieving a wallet" };
             }
         });
     }
     creditWallet(req, token) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.logger.logInfo("creditWallet', req: " + req);
             const { amount } = req.body;
             try {
                 // Check if the authorization header is missing
@@ -307,7 +317,7 @@ class WalletService {
                 return { success: true, wallet: wallet };
             }
             catch (error) {
-                console.error('Error crediting wallet:', error);
+                this.logger.logError('Error crediting wallet:', error.message.toString());
                 return { success: false, error: "Error retrieving a wallet" };
             }
         });
@@ -315,6 +325,7 @@ class WalletService {
     withdrawFunds(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
+            this.logger.logInfo("withdrawFunds', req: " + req);
             try {
                 const { amount } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
@@ -362,7 +373,7 @@ class WalletService {
                 return { success: true, newBalance: wallet.balance };
             }
             catch (error) {
-                console.error('Error withdrawing funds:', error);
+                this.logger.logError('Error withdrawing funds:', error.message.toString());
                 throw new Error("Internal server error");
             }
         });

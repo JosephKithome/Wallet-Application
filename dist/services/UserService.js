@@ -14,9 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const schema_1 = require("../models/schema");
+const logger_1 = require("../utils/logger");
 class UserService {
+    constructor() {
+        this.logger = new logger_1.CustomLogger();
+    }
     getUserById(userId, token) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.logger.logInfo('getUserById', userId);
             try {
                 // Check if the token is null or missing
                 if (!token || token === "null") {
@@ -50,13 +55,14 @@ class UserService {
                 return { success: true, user };
             }
             catch (error) {
-                console.error('Error fetching user:', error);
+                this.logger.logError('Error fetching user:', error.message);
                 throw new Error("Internal server error");
             }
         });
     }
     updateUserProfile(userId, userData, token) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.logger.logInfo("updateUserProfile', userId: " + userId);
             try {
                 // Check if the token is null or missing
                 if (!token || token === "null") {
@@ -90,7 +96,7 @@ class UserService {
                 return { success: true, updatedUser };
             }
             catch (error) {
-                console.error('Error updating user profile:', error);
+                this.logger.logError('Error updating user profile', error.message.toString());
                 return { success: false, error: "Error updating user profile" };
             }
         });

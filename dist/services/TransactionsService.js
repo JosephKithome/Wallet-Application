@@ -23,6 +23,7 @@ class TransactionService {
     sendFunds(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
+            this.logger.logInfo("SendFunds", JSON.stringify(req));
             try {
                 const { amount, receiverAccountNumber } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
@@ -100,7 +101,7 @@ class TransactionService {
                 return { success: true, newBalance: wallet.balance };
             }
             catch (error) {
-                this.logger.logError(error.message.toString());
+                this.logger.logError('Error sending funds', error.message);
                 throw new Error("Internal server error");
             }
         });
@@ -108,6 +109,7 @@ class TransactionService {
     getWalletTransactions(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
+            this.logger.logInfo("getWalletTransactions", JSON.stringify(req));
             try {
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
                 if (!token) {
@@ -131,7 +133,7 @@ class TransactionService {
                 return { success: true, transactions };
             }
             catch (error) {
-                this.logger.logError(error.message.toString());
+                this.logger.logError('Error getting wallet transactions', error.message);
                 throw new Error("Internal server error");
             }
         });
@@ -139,6 +141,7 @@ class TransactionService {
     getTransactionsByWalletId(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
+            this.logger.logInfo("getTransactionsByWalletId", JSON.stringify(req));
             try {
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
                 if (!token) {
@@ -161,7 +164,7 @@ class TransactionService {
                 return { success: true, transactions };
             }
             catch (error) {
-                this.logger.logError(error.message.toString());
+                this.logger.logError('Error fetching transactions:', error.message.toString());
                 throw new Error("Internal server error");
             }
         });

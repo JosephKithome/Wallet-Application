@@ -10,7 +10,7 @@ class CurrencyService {
     async createCurrency(req: Request): Promise<{ success: boolean; currency?: any; error?: string }> {
 
         this.logger.logInfo('create Currency', JSON.stringify(req));
-        
+
         try {
             const token = req.headers.authorization?.split(' ')[1];
 
@@ -59,7 +59,6 @@ class CurrencyService {
 
             return { success: true, currency: newCurrency };
         } catch (error: any) {
-            console.error('Error creating currency:', error);
             this.logger.logError('Error creating currency:', error.message.toString());
             throw new Error("An unexpected error occurred");
         }

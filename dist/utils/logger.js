@@ -10,10 +10,10 @@ class CustomLogger {
         this.logger = winston_1.default.createLogger({
             transports: [
                 new winston_1.default.transports.Console(),
-                new winston_1.default.transports.File({ filename: 'error.log', level: 'error' }),
-                new winston_1.default.transports.File({ filename: 'info.log', level: 'info' }),
-                new winston_1.default.transports.File({ filename: 'debug.log', level: 'debug' }),
-                new winston_1.default.transports.File({ filename: 'warn.log', level: 'warn' }),
+                new winston_1.default.transports.File({ filename: 'logs/error.log', level: 'error' }),
+                new winston_1.default.transports.File({ filename: 'logs/info.log', level: 'info' }),
+                new winston_1.default.transports.File({ filename: 'logs/debug.log', level: 'debug' }),
+                new winston_1.default.transports.File({ filename: 'logs/warn.log', level: 'warn' }),
             ]
         });
     }
