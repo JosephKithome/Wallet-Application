@@ -338,7 +338,7 @@ class WalletService {
                     timestamp: new Date()
                 });
                 yield message.save();
-                (0, sms_1.sendSMSNotification)("254717064174", message.message);
+                // sendSMSNotification("254717064174", message.message);
                 return { success: true, wallet: wallet };
             }
             catch (error) {
@@ -394,7 +394,7 @@ class WalletService {
                     timestamp: new Date()
                 });
                 yield message.save();
-                (0, sms_1.sendSMSNotification)("254717064174", message.message);
+                // sendSMSNotification("254717064174", message.message);
                 return { success: true, newBalance: wallet.balance };
             }
             catch (error) {

@@ -391,7 +391,7 @@ class WalletService {
             })
             await message.save();
 
-            sendSMSNotification("254717064174", message.message);
+            // sendSMSNotification("254717064174", message.message);
 
             return { success: true, wallet: wallet };
         } catch (error: any) {
@@ -463,7 +463,7 @@ class WalletService {
             })
             await message.save();
 
-            sendSMSNotification("254717064174", message.message);
+            // sendSMSNotification("254717064174", message.message);
 
             return { success: true, newBalance: wallet.balance };
         } catch (error: any) {
