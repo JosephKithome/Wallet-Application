@@ -168,7 +168,8 @@ class WalletService {
             const senderTransaction = await Transaction.create({
                 senderId: userId,
                 amount,
-                type: 'debit'
+                type: 'debit',
+                walletAccountNumber: wallet.walletAccountNumber
             });
             senderTransaction.save();
 

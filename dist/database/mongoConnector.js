@@ -16,7 +16,7 @@ class MongoConnector {
                 this.logger.logInfo('Connected to MongoDB');
             })
                 .catch((error) => {
-                this.logger.logError('MongoDB connection error:', error);
+                this.logger.logError('MongoDB connection error:', error.message.toString());
             });
         };
     }

@@ -73,6 +73,7 @@ const transactionSchema: Schema = new Schema({
     receiverId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
     amount: { type: Number, required: true },
     timestamp: { type: Date, default: Date.now },
+    walletAccountNumber: { type: String, required: true},
     type: { type: String, enum: ['credit', 'debit'], required: true },
 });
 

@@ -150,7 +150,8 @@ class WalletService {
                 const senderTransaction = yield schema_1.Transaction.create({
                     senderId: userId,
                     amount,
-                    type: 'debit'
+                    type: 'debit',
+                    walletAccountNumber: wallet.walletAccountNumber
                 });
                 senderTransaction.save();
                 // Update sender's balance
