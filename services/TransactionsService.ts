@@ -2,8 +2,10 @@ import jwt from 'jsonwebtoken';
 import { Request } from 'express';
 import { Wallet,Transaction,Notification } from '../models/schema';
 import { sendSMSNotification } from '../integrations/sms';
+import { CustomLogger } from '../utils/logger';
 
 class TransactionService {
+    private logger = new CustomLogger();
 
     async sendFunds(req: Request): Promise<{ success: boolean; newBalance?: number; error?: string }> {
         try {
@@ -104,8 +106,8 @@ class TransactionService {
             await msg.save();
 
             return { success: true, newBalance: wallet.balance };
-        } catch (error) {
-            console.error('Error sending funds:', error);
+        } catch (error: any) {
+            this.logger.logError(error.message.toString());
             throw new Error("Internal server error");
         }
     }
@@ -138,7 +140,8 @@ class TransactionService {
             }).sort({ timestamp: -1 });
 
             return { success: true, transactions };
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.logError(error.message.toString());
             throw new Error("Internal server error");
         }
     }
@@ -171,8 +174,8 @@ class TransactionService {
             const transactions = await Transaction.find({ walletAccountNumber: walletId });
 
             return { success: true, transactions };
-        } catch (error) {
-            console.error('Error fetching transactions:', error);
+        } catch (error: any) {
+            this.logger.logError(error.message.toString());
             throw new Error("Internal server error");
         }
     }

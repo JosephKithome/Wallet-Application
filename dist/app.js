@@ -4,17 +4,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
-const mongoConnector_1 = require("./database/mongoConnector");
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_1 = require("./documentation/swagger");
+const mongoConnector_1 = require("./database/mongoConnector");
 const AuthController_1 = require("./controllers/auth/AuthController");
 const UserController_1 = require("./controllers/user/UserController");
 const WalletController_1 = require("./controllers/wallet/WalletController");
 const TransactionsController_1 = require("./controllers/transactions/TransactionsController");
 const CurrencyController_1 = require("./controllers/currency/CurrencyController");
 const BankController_1 = require("./controllers/bank/BankController");
+const logger_1 = require("./utils/logger");
 exports.app = (0, express_1.default)();
 // Middleware
 exports.app.use(body_parser_1.default.json());
@@ -31,6 +32,7 @@ const walletController = new WalletController_1.WalletControlller();
 const transactionController = new TransactionsController_1.TransactionController();
 const currencyController = new CurrencyController_1.CurrencyController();
 const bankController = new BankController_1.BankController();
+const logger = new logger_1.CustomLogger();
 exports.app.post("/api/v1/user/signup", authController.signUp);
 exports.app.post("/api/v1/user/login", authController.login);
 exports.app.get('/api/v1/user/:userId', userController.getUserById);
@@ -53,7 +55,7 @@ function runServer() {
     try {
         mongoConnector.connect();
         exports.app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
+            logger.logInfo(`Server started on port ${PORT}`);
         });
     }
     catch (e) {

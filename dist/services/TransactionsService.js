@@ -15,7 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const schema_1 = require("../models/schema");
 const sms_1 = require("../integrations/sms");
+const logger_1 = require("../utils/logger");
 class TransactionService {
+    constructor() {
+        this.logger = new logger_1.CustomLogger();
+    }
     sendFunds(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -96,7 +100,7 @@ class TransactionService {
                 return { success: true, newBalance: wallet.balance };
             }
             catch (error) {
-                console.error('Error sending funds:', error);
+                this.logger.logError(error.message.toString());
                 throw new Error("Internal server error");
             }
         });
@@ -127,6 +131,7 @@ class TransactionService {
                 return { success: true, transactions };
             }
             catch (error) {
+                this.logger.logError(error.message.toString());
                 throw new Error("Internal server error");
             }
         });
@@ -156,7 +161,7 @@ class TransactionService {
                 return { success: true, transactions };
             }
             catch (error) {
-                console.error('Error fetching transactions:', error);
+                this.logger.logError(error.message.toString());
                 throw new Error("Internal server error");
             }
         });

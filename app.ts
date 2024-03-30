@@ -1,15 +1,18 @@
-import { MongoConnector } from './database/mongoConnector';
-import { sendSMSNotification } from './integrations/sms';
+
+
 import express, { Application, Request, Response } from 'express';
+import winston from 'winston';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from './documentation/swagger';
+import { MongoConnector } from './database/mongoConnector';
 import { AuthController } from './controllers/auth/AuthController';
 import { UserController } from './controllers/user/UserController';
 import { WalletControlller } from './controllers/wallet/WalletController';
 import { TransactionController } from './controllers/transactions/TransactionsController';
 import { CurrencyController } from './controllers/currency/CurrencyController';
 import { BankController } from './controllers/bank/BankController';
+import { CustomLogger } from './utils/logger';
 
 
 export const app: Application = express();
@@ -32,6 +35,7 @@ const walletController = new WalletControlller();
 const transactionController = new TransactionController();
 const currencyController = new CurrencyController();
 const bankController = new BankController();
+const  logger = new CustomLogger();
 
 
 app.post("/api/v1/user/signup", authController.signUp);
@@ -60,7 +64,7 @@ function runServer() {
     try {
         mongoConnector.connect();
         app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
+            logger.logInfo(`Server started on port ${PORT}`)
         });
     } catch (e) {
         console.error(e);
