@@ -2,8 +2,15 @@ import jwt from 'jsonwebtoken';
 import { Request } from 'express';
 import { Currency } from '../models/schema';
 
+import { CustomLogger } from '../utils/logger';
+
 class CurrencyService {
+
+    private logger = new CustomLogger();
     async createCurrency(req: Request): Promise<{ success: boolean; currency?: any; error?: string }> {
+
+        this.logger.logInfo('create Currency', JSON.stringify(req));
+        
         try {
             const token = req.headers.authorization?.split(' ')[1];
 
@@ -51,13 +58,17 @@ class CurrencyService {
             await newCurrency.save();
 
             return { success: true, currency: newCurrency };
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating currency:', error);
+            this.logger.logError('Error creating currency:', error.message.toString());
             throw new Error("An unexpected error occurred");
         }
     }
 
     async getCurrencies(req: Request): Promise<{ success: boolean; currencies?: any[]; error?: string }> {
+
+        this.logger.logInfo("getCurrencies", JSON.stringify(req));
+
         try {
             const token = req.headers.authorization?.split(' ')[1];
 
@@ -90,8 +101,8 @@ class CurrencyService {
             const currencies = await Currency.find();
 
             return { success: true, currencies };
-        } catch (error) {
-            console.error('Error fetching currencies:', error);
+        } catch (error: any) {
+            this.logger.logError('Error fetching currencies:', error.message.toString());
             throw new Error("An unexpected error occurred");
         }
     }

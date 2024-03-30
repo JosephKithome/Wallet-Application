@@ -8,6 +8,9 @@ class TransactionService {
     private logger = new CustomLogger();
 
     async sendFunds(req: Request): Promise<{ success: boolean; newBalance?: number; error?: string }> {
+
+        this.logger.logInfo("SendFunds", JSON.stringify(req));
+        
         try {
             const { amount, receiverAccountNumber } = req.body;
 
@@ -107,11 +110,14 @@ class TransactionService {
 
             return { success: true, newBalance: wallet.balance };
         } catch (error: any) {
-            this.logger.logError(error.message.toString());
+            this.logger.logError('Error sending funds', error.message);
             throw new Error("Internal server error");
         }
     }
     async getWalletTransactions(req: Request): Promise<{ success: boolean; transactions?: any[]; error?: string }> {
+
+        this.logger.logInfo("getWalletTransactions", JSON.stringify(req));
+
         try {
             const token = req.headers.authorization?.split(' ')[1];
 
@@ -140,13 +146,16 @@ class TransactionService {
             }).sort({ timestamp: -1 });
 
             return { success: true, transactions };
-        } catch (error: any) {
-            this.logger.logError(error.message.toString());
+        } catch (error:any) {
+            this.logger.logError('Error getting wallet transactions', error.message);
             throw new Error("Internal server error");
         }
     }
 
     async getTransactionsByWalletId(req: Request): Promise<{ success: boolean; transactions?: any[]; error?: string }> {
+
+        this.logger.logInfo("getTransactionsByWalletId", JSON.stringify(req));
+
         try {
             const token = req.headers.authorization?.split(' ')[1];
 
@@ -175,7 +184,7 @@ class TransactionService {
 
             return { success: true, transactions };
         } catch (error: any) {
-            this.logger.logError(error.message.toString());
+            this.logger.logError('Error fetching transactions:', error.message.toString());
             throw new Error("Internal server error");
         }
     }

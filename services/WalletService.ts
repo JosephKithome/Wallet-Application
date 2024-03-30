@@ -3,13 +3,18 @@ import { Request, Response } from 'express';
 import { sendSMSNotification } from '../integrations/sms';
 import { Wallet, Notification, Transaction, Currency } from '../models/schema';
 import { WalletHelper } from './../utils/utils';
+import { CustomLogger } from '../utils/logger';
 
 
 class WalletService {
 
     private helper = new WalletHelper();
+    private logger = new CustomLogger();
 
     async createWallet(walletData: any, token: string): Promise<{ success: boolean; wallet?: any; error?: string }> {
+        
+        this.logger.logInfo('createWallet payload: ' + JSON.stringify(walletData));
+
         try {
 
             const { name, openedAt, expiresAt, isSuspended, balance, currency } = walletData.body;
@@ -78,11 +83,15 @@ class WalletService {
             await newWallet.save();
 
             return { success: true, wallet: newWallet };
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.logError('Error creating wallet:', error.message.toString());
             return { success: false, error: "Error when creating a wallet" };
         }
     }
     async debitWallet(req: Request): Promise<{ success: boolean; wallet?: any; error?: string }> {
+
+        this.logger.logInfo("debitWallet', req: " + req);
+
         try {
             const { amount, walletAccountNumber } = req.body;
 
@@ -179,13 +188,16 @@ class WalletService {
             sendSMSNotification("254717064174", message.message);
 
             return { success: true, wallet };
-        } catch (error) {
-            console.error('Error debiting wallet:', error);
+        } catch (error: any) {
+            this.logger.logError('Error debiting wallet:', error.message.toString());
             throw new Error("An unexpected error occurred");
         }
     }
 
     async getWalletBalance(req: Request): Promise<{ success: boolean; wallet?: any; error?: string }> {
+
+        this.logger.logInfo("getWalletBalance', req: " + req);
+
         try {
             const { walletAccountNumber } = req.body;
 
@@ -224,11 +236,15 @@ class WalletService {
             }
 
             return { success: true, wallet };
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.logError('Error while getting wallet balance', error.messae.toString());
             return { success: false, error: "An unexpected error occurred" };
         }
     }
     async getWalletByName(walletData: any, token: string): Promise<{ success: boolean; wallet?: any; error?: string }> {
+
+        this.logger.logInfo("getWalletByName', walletData: " + walletData);
+
         try {
 
             const { name } = walletData.body;
@@ -274,12 +290,16 @@ class WalletService {
             }
 
             return { success: true, wallet: wallet };
-        } catch (error) {
+        } catch (error: any) {
+            this.logger.logDebug('Error while creating', error.message.toString());
             return { success: false, error: "Error retrieving a wallet" };
         }
     }
 
     async creditWallet(req: any, token: string): Promise<{ success: boolean; wallet?: any; error?: string }> {
+
+        this.logger.logInfo("creditWallet', req: " + req);
+
         const { amount } = req.body;
 
         try {
@@ -348,13 +368,17 @@ class WalletService {
             sendSMSNotification("254717064174", message.message);
 
             return { success: true, wallet: wallet };
-        } catch (error) {
-            console.error('Error crediting wallet:', error);
+        } catch (error: any) {
+
+            this.logger.logError('Error crediting wallet:', error.message.toString());
             return { success: false, error: "Error retrieving a wallet" };
         }
     }
 
     async withdrawFunds(req: Request): Promise<{ success: boolean; newBalance?: number; error?: string }> {
+
+        this.logger.logInfo("withdrawFunds', req: " + req);
+
         try {
 
             const { amount } = req.body;
@@ -416,8 +440,9 @@ class WalletService {
             sendSMSNotification("254717064174", message.message);
 
             return { success: true, newBalance: wallet.balance };
-        } catch (error) {
-            console.error('Error withdrawing funds:', error);
+        } catch (error: any) {
+
+            this.logger.logError('Error withdrawing funds:', error.message.toString());
             throw new Error("Internal server error");
         }
     }

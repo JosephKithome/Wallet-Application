@@ -1,8 +1,15 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/schema';
+import { CustomLogger } from '../utils/logger';
 
 class UserService {
+
+    private logger = new CustomLogger();
+
     async getUserById(userId: string, token: string): Promise<{ success: boolean; user?: any; error?: string }> {
+
+        this.logger.logInfo('getUserById', userId);
+        
         try {
             // Check if the token is null or missing
             if (!token || token === "null") {
@@ -38,13 +45,16 @@ class UserService {
             }
 
             return { success: true, user };
-        } catch (error) {
-            console.error('Error fetching user:', error);
+        } catch (error: any) {
+            this.logger.logError('Error fetching user:', error.message);
             throw new Error("Internal server error");
         }
     }
 
     async updateUserProfile(userId: string, userData: any, token: string): Promise<{ success: boolean; updatedUser?: any; error?: string }> {
+
+        this.logger.logInfo("updateUserProfile', userId: " + userId);
+
         try {
             // Check if the token is null or missing
             if (!token || token === "null") {
@@ -80,8 +90,8 @@ class UserService {
             }
 
             return { success: true, updatedUser };
-        } catch (error) {
-            console.error('Error updating user profile:', error);
+        } catch (error: any) {
+            this.logger.logError('Error updating user profile', error.message.toString());
             return { success: false, error: "Error updating user profile" };
         }
     }
