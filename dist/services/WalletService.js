@@ -15,8 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const sms_1 = require("../integrations/sms");
 const schema_1 = require("../models/schema");
-const utils_1 = require("../utils/utils");
+const utils_1 = require("./../utils/utils");
 class WalletService {
+    constructor() {
+        this.helper = new utils_1.WalletHelper();
+    }
     createWallet(walletData, token) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -40,6 +43,10 @@ class WalletService {
                 // Check if payload is valid
                 if (!payload || typeof payload === 'string') {
                     return { success: false, error: "Unauthorized" };
+                }
+                // Check if the token has expired
+                if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                    return { success: false, error: "Token has expired" };
                 }
                 // Extract userId from payload
                 const userId = payload.subject;
@@ -67,8 +74,8 @@ class WalletService {
                     userId: userId,
                     name: name,
                     balance: 0,
-                    walletAccountNumber: (0, utils_1.accountNumberGenerator)(),
-                    expiresAt: (0, utils_1.getWalletExpiryDate)(),
+                    walletAccountNumber: this.helper.accountNumberGenerator(),
+                    expiresAt: this.helper.getWalletExpiryDate(),
                     currency: currencyExists._id
                 });
                 yield newWallet.save();
@@ -97,6 +104,10 @@ class WalletService {
                 }
                 if (!payload || typeof payload === 'string') {
                     return { success: false, error: "Unauthorized" };
+                }
+                // Check if the token has expired
+                if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                    return { success: false, error: "Token has expired" };
                 }
                 const userId = payload.subject;
                 if (walletAccountNumber === null || walletAccountNumber === undefined) {
@@ -176,6 +187,10 @@ class WalletService {
                 if (!payload || typeof payload === 'string') {
                     return { success: false, error: "Unauthorized" };
                 }
+                // Check if the token has expired
+                if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                    return { success: false, error: "Token has expired" };
+                }
                 const userId = payload.subject;
                 if (walletAccountNumber == "" || walletAccountNumber === undefined) {
                     return { success: false, error: "Account number cannot be empty" };
@@ -210,6 +225,10 @@ class WalletService {
                 }
                 catch (error) {
                     return { success: false, error: "Unauthorized" };
+                }
+                // Check if the token has expired
+                if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                    return { success: false, error: "Token has expired" };
                 }
                 // Check if payload is valid
                 if (!payload || typeof payload === 'string') {
@@ -255,6 +274,10 @@ class WalletService {
                 // Check if payload is valid
                 if (!payload || typeof payload === 'string') {
                     return { success: false, error: "Unauthorized" };
+                }
+                // Check if the token has expired
+                if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                    return { success: false, error: "Token has expired" };
                 }
                 // Extract userId from payload
                 const userId = payload.subject;
@@ -307,6 +330,10 @@ class WalletService {
                 }
                 if (!payload || typeof payload === 'string') {
                     return { success: false, error: "Unauthorized" };
+                }
+                // Check if the token has expired
+                if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                    return { success: false, error: "Token has expired" };
                 }
                 const userId = payload.subject;
                 if (amount === null || amount === undefined || amount <= 0) {

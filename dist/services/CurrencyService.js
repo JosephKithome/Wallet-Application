@@ -34,7 +34,7 @@ class CurrencyService {
                     return { success: false, error: "Unauthorized" };
                 }
                 // Check if the token has expired
-                if (payload.expiryDate && new Date(payload.expiryDate) < new Date()) {
+                if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
                     return { success: false, error: "Token has expired" };
                 }
                 const userId = payload.subject;

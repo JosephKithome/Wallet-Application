@@ -1,31 +1,16 @@
+import { MongoConnector } from './database/mongoConnector';
 import { sendSMSNotification } from './integrations/sms';
 import express, { Application, Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import jwt, { JwtPayload } from 'jsonwebtoken';
 import swaggerUi from 'swagger-ui-express';
-import { dbConection } from './database/mongoConnector';
-import {
-    BankAccount,
-    Currency,
-    Notification,
-    Transaction,
-    User,
-    Wallet
-} from './models/schema';
 import { swaggerDocument } from './documentation/swagger';
-import bcrypt from 'bcrypt';
-import {
-    accountNumberGenerator,
-    generateRandomCVV,
-    getWalletExpiryDate
-} from './utils/utils';
-
 import { AuthController } from './controllers/auth/AuthController';
 import { UserController } from './controllers/user/UserController';
 import { WalletControlller } from './controllers/wallet/WalletController';
 import { TransactionController } from './controllers/transactions/TransactionsController';
 import { CurrencyController } from './controllers/currency/CurrencyController';
 import { BankController } from './controllers/bank/BankController';
+
 
 export const app: Application = express();
 
@@ -40,6 +25,7 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to Wallet Application');
 });
 
+const  mongoConnector = new MongoConnector();
 const authController = new AuthController();
 const userController = new UserController();
 const walletController = new WalletControlller();
@@ -72,7 +58,7 @@ const PORT = process.env.PORT || 3000;
 
 function runServer() {
     try {
-        dbConection();
+        mongoConnector.connect();
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });

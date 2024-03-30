@@ -1,13 +1,13 @@
+import { WalletHelper } from './../utils/utils';
 import jwt from 'jsonwebtoken';
 import { Request } from 'express';
 import { BankAccount, Currency } from '../models/schema';
-import {
-    accountNumberGenerator,
-    generateRandomCVV,
-    getWalletExpiryDate
-} from '../utils/utils';
+
 
 class BankService {
+
+    private  helper = new WalletHelper();
+
     async createBankAccount(req: Request): Promise<{ success: boolean; bankAccount?: any; error?: string }> {
         try {
             const { name, currency, status } = req.body;
@@ -58,10 +58,10 @@ class BankService {
             const newBankAccount = new BankAccount({
                 userId: userId,
                 name: name,
-                accountNumber: accountNumberGenerator().toString(),
+                accountNumber: this.helper.accountNumberGenerator().toString(),
                 openedAt: new Date(),
-                expiresAt: getWalletExpiryDate(),
-                cvv: generateRandomCVV(),
+                expiresAt: this.helper.getWalletExpiryDate(),
+                cvv: this.helper.generateRandomCVV(),
                 balance: 0,
                 status: status,
                 currency: currency

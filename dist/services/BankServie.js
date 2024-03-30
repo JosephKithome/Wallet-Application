@@ -12,10 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = require("./../utils/utils");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const schema_1 = require("../models/schema");
-const utils_1 = require("../utils/utils");
 class BankService {
+    constructor() {
+        this.helper = new utils_1.WalletHelper();
+    }
     createBankAccount(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -34,6 +37,10 @@ class BankService {
                 }
                 if (!payload || typeof payload === 'string') {
                     return { success: false, error: "Unauthorized" };
+                }
+                // Check if the token has expired
+                if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                    return { success: false, error: "Token has expired" };
                 }
                 // Extract userId from payload
                 const userId = payload.subject;
@@ -54,10 +61,10 @@ class BankService {
                 const newBankAccount = new schema_1.BankAccount({
                     userId: userId,
                     name: name,
-                    accountNumber: (0, utils_1.accountNumberGenerator)().toString(),
+                    accountNumber: this.helper.accountNumberGenerator().toString(),
                     openedAt: new Date(),
-                    expiresAt: (0, utils_1.getWalletExpiryDate)(),
-                    cvv: (0, utils_1.generateRandomCVV)(),
+                    expiresAt: this.helper.getWalletExpiryDate(),
+                    cvv: this.helper.generateRandomCVV(),
                     balance: 0,
                     status: status,
                     currency: currency

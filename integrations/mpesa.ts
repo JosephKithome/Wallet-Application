@@ -4,6 +4,7 @@
 
 const generateMpesaToken = (payload: any) =>{
     // TODO: implement this function
+    
 }
 
 const sendMoneyC2B = (payload: any) =>{

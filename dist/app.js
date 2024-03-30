@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
+const mongoConnector_1 = require("./database/mongoConnector");
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
-const mongoConnector_1 = require("./database/mongoConnector");
 const swagger_1 = require("./documentation/swagger");
 const AuthController_1 = require("./controllers/auth/AuthController");
 const UserController_1 = require("./controllers/user/UserController");
@@ -24,6 +24,7 @@ exports.app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_expr
 exports.app.get('/', (req, res) => {
     res.send('Welcome to Wallet Application');
 });
+const mongoConnector = new mongoConnector_1.MongoConnector();
 const authController = new AuthController_1.AuthController();
 const userController = new UserController_1.UserController();
 const walletController = new WalletController_1.WalletControlller();
@@ -50,7 +51,7 @@ exports.app.post('/api/v1/bank/account', bankController.createBankAccount);
 const PORT = process.env.PORT || 3000;
 function runServer() {
     try {
-        (0, mongoConnector_1.dbConection)();
+        mongoConnector.connect();
         exports.app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });

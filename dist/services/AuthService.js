@@ -78,7 +78,7 @@ class AuthService {
                     return { success: false, error: 'Invalid password' };
                 }
                 // Generate token
-                const payload = { subject: dbUser._id, expiresAt: Math.floor(Date.now() / 1000) + 5 };
+                const payload = { subject: dbUser._id, expiresAt: new Date(Date.now() + (1 * 60 * 60 * 1000)) };
                 const token = jsonwebtoken_1.default.sign(payload, `${process.env.SECRET_KEY}`);
                 return { success: true, token };
             }

@@ -2,13 +2,13 @@ import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { sendSMSNotification } from '../integrations/sms';
 import { Wallet, Notification, Transaction, Currency } from '../models/schema';
-import {
-    accountNumberGenerator,
-    generateRandomCVV,
-    getWalletExpiryDate
-} from '../utils/utils';
+import { WalletHelper } from './../utils/utils';
+
 
 class WalletService {
+
+    private helper = new WalletHelper();
+
     async createWallet(walletData: any, token: string): Promise<{ success: boolean; wallet?: any; error?: string }> {
         try {
 
@@ -71,8 +71,8 @@ class WalletService {
                 userId: userId,
                 name: name,
                 balance: 0,
-                walletAccountNumber: accountNumberGenerator(),
-                expiresAt: getWalletExpiryDate(),
+                walletAccountNumber: this.helper.accountNumberGenerator(),
+                expiresAt: this.helper.getWalletExpiryDate(),
                 currency: currencyExists._id
             });
             await newWallet.save();
