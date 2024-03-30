@@ -9,7 +9,7 @@ class UserService {
     async getUserById(userId: string, token: string): Promise<{ success: boolean; user?: any; error?: string }> {
 
         this.logger.logInfo('getUserById', userId);
-        
+
         try {
             // Check if the token is null or missing
             if (!token || token === "null") {
@@ -39,7 +39,7 @@ class UserService {
             }
 
             // Find user by ID
-            const user = await User.findById(userId);
+            const user = await User.findById(userId).populate('Wallet');
             if (!user) {
                 return { success: false, error: "User not found" };
             }

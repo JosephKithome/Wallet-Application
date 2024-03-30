@@ -48,7 +48,7 @@ class UserService {
                     return { success: false, error: "Please provide a valid user ID" };
                 }
                 // Find user by ID
-                const user = yield schema_1.User.findById(userId);
+                const user = yield schema_1.User.findById(userId).populate('Wallet');
                 if (!user) {
                     return { success: false, error: "User not found" };
                 }
