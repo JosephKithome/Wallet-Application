@@ -95,7 +95,7 @@ class WalletService {
         }
     }
     async debitWallet(req: Request): Promise<{ success: boolean; wallet?: any; error?: string }> {
-        this.logger.logInfo("debitWallet', req: " + req);
+        this.logger.logInfo("debitWallet', req: " + JSON.stringify(req));
 
         try {
             const { amount, walletAccountNumber } = req.body;

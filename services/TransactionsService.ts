@@ -116,7 +116,7 @@ class TransactionService {
     }
     async getWalletTransactions(req: Request): Promise<{ success: boolean; transactions?: any[]; error?: string }> {
 
-        this.logger.logInfo("getWalletTransactions", JSON.stringify(req));
+        this.logger.logInfo("getWalletTransactions" + req);
 
         try {
             const token = req.headers.authorization?.split(' ')[1];

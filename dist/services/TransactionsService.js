@@ -109,7 +109,7 @@ class TransactionService {
     getWalletTransactions(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("getWalletTransactions", JSON.stringify(req));
+            this.logger.logInfo("getWalletTransactions" + req);
             try {
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
                 if (!token) {

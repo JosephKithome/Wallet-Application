@@ -94,7 +94,7 @@ class WalletService {
     debitWallet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("debitWallet', req: " + req);
+            this.logger.logInfo("debitWallet', req: " + JSON.stringify(req));
             try {
                 const { amount, walletAccountNumber } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
