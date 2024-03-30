@@ -21,6 +21,7 @@ class WalletService {
     constructor() {
         this.helper = new utils_1.WalletHelper();
         this.logger = new logger_1.CustomLogger();
+        this.transactionLock = false;
     }
     createWallet(walletData, token) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -115,33 +116,47 @@ class WalletService {
                     return { success: false, error: "Token has expired" };
                 }
                 const userId = payload.subject;
-                if (walletAccountNumber === null || walletAccountNumber === undefined) {
+                if (!walletAccountNumber) {
                     return { success: false, error: "Account number cannot be empty" };
                 }
                 if (typeof amount !== 'number' || amount <= 0) {
                     return { success: false, error: "Invalid amount" };
                 }
+                // Acquire lock to prevent concurrent transactions
+                if (this.transactionLock) {
+                    return { success: false, error: "Another transaction is in progress. Please try again later." };
+                }
+                this.transactionLock = true;
                 const wallet = yield schema_1.Wallet.findOne({ userId });
                 if (!wallet) {
+                    this.transactionLock = false;
                     return { success: false, error: "Wallet not found" };
                 }
                 const receiver = yield schema_1.Wallet.findOne({ walletAccountNumber });
                 if (!receiver) {
+                    this.transactionLock = false;
                     return { success: false, error: "Receiver wallet not found" };
                 }
                 if (amount > wallet.balance) {
+                    this.transactionLock = false;
                     return { success: false, error: "Insufficient funds" };
                 }
+                // Simulate transaction delay
+                yield this.delay(1000);
+                // Update receiver's balance
                 receiver.balance += amount;
                 yield receiver.save();
+                // Create sender's transaction
                 const senderTransaction = yield schema_1.Transaction.create({
                     senderId: userId,
                     amount,
                     type: 'debit'
                 });
                 senderTransaction.save();
+                // Update sender's balance
                 wallet.balance -= amount;
                 yield wallet.save();
+                // Create receiver's transaction
                 const receiverTransaction = yield schema_1.Transaction.create({
                     senderId: userId,
                     receiverWalletAccountNumber: receiver.walletAccountNumber,
@@ -149,28 +164,36 @@ class WalletService {
                     type: 'credit'
                 });
                 receiverTransaction.save();
-                // send notification
-                const message = new schema_1.Notification({
+                // Send notification to sender
+                const senderMessage = new schema_1.Notification({
                     userId: wallet.userId,
-                    message: `Congratulations ${amount} Kes  credited  to ${receiver.walletAccountNumber} ${wallet.name} on ${new Date()}`,
+                    message: `Confirmed ${amount} Kes debited from ${wallet.walletAccountNumber} ${wallet.name} on ${new Date()}`,
                     timestamp: new Date()
                 });
-                yield message.save();
-                (0, sms_1.sendSMSNotification)("254717064174", message.message);
-                // send notification
-                const msg = new schema_1.Notification({
+                yield senderMessage.save();
+                (0, sms_1.sendSMSNotification)("254717064174", senderMessage.message);
+                // Send notification to receiver
+                const receiverMessage = new schema_1.Notification({
                     userId: wallet.userId,
-                    message: `Confirmed ${amount} Kes  debited  from ${wallet.walletAccountNumber} ${wallet.name} on ${new Date()}`,
+                    message: `Congratulations ${amount} Kes credited to ${receiver.walletAccountNumber} ${wallet.name} on ${new Date()}`,
                     timestamp: new Date()
                 });
-                yield msg.save();
-                (0, sms_1.sendSMSNotification)("254717064174", message.message);
+                yield receiverMessage.save();
+                (0, sms_1.sendSMSNotification)("254717064174", receiverMessage.message);
+                // Release lock
+                this.transactionLock = false;
                 return { success: true, wallet };
             }
             catch (error) {
                 this.logger.logError('Error debiting wallet:', error.message.toString());
                 throw new Error("An unexpected error occurred");
             }
+        });
+    }
+    // Simulate delay
+    delay(ms) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise(resolve => setTimeout(resolve, ms));
         });
     }
     getWalletBalance(req) {
