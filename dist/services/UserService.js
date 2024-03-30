@@ -48,11 +48,15 @@ class UserService {
                     return { success: false, error: "Please provide a valid user ID" };
                 }
                 // Find user by ID
-                const user = yield schema_1.User.findById(userId).populate('Wallet');
+                const user = yield schema_1.User.findById(userId);
                 if (!user) {
                     return { success: false, error: "User not found" };
                 }
-                return { success: true, user };
+                const wallet = yield schema_1.Wallet.findOne({ userId: userId });
+                if (!wallet) {
+                    return { success: false, error: "Wallet not found" };
+                }
+                return { success: true, data: { user: user, wallet: wallet } };
             }
             catch (error) {
                 this.logger.logError('Error fetching user:', error.message);

@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../models/schema';
+import { User, Wallet } from '../models/schema';
 import { CustomLogger } from '../utils/logger';
 
 class UserService {
 
     private logger = new CustomLogger();
 
-    async getUserById(userId: string, token: string): Promise<{ success: boolean; user?: any; error?: string }> {
+    async getUserById(userId: string, token: string): Promise<{ success: boolean; user?: any; error?: string, data?: any }> {
 
         this.logger.logInfo('getUserById', userId);
 
@@ -28,8 +28,8 @@ class UserService {
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
             }
-             // Check if the token has expired
-             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+            // Check if the token has expired
+            if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
                 return { success: false, error: "Token has expired" };
             }
 
@@ -39,12 +39,18 @@ class UserService {
             }
 
             // Find user by ID
-            const user = await User.findById(userId).populate('Wallet');
+            const user = await User.findById(userId);
             if (!user) {
                 return { success: false, error: "User not found" };
             }
 
-            return { success: true, user };
+            const wallet = await Wallet.findOne({ userId: userId });
+            if (!wallet) {
+                return { success: false, error: "Wallet not found" };
+            }
+
+
+            return { success: true, data: { user: user, wallet: wallet } };
         } catch (error: any) {
             this.logger.logError('Error fetching user:', error.message);
             throw new Error("Internal server error");
@@ -73,8 +79,8 @@ class UserService {
             if (!payload || typeof payload === 'string') {
                 return { success: false, error: "Unauthorized" };
             }
-             // Check if the token has expired
-             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+            // Check if the token has expired
+            if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
                 return { success: false, error: "Token has expired" };
             }
 
