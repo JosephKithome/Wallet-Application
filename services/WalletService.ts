@@ -180,7 +180,7 @@ class WalletService {
             // Create receiver's transaction
             const receiverTransaction = await Transaction.create({
                 senderId: userId,
-                receiverWalletAccountNumber: receiver.walletAccountNumber,
+                walletAccountNumber: receiver.walletAccountNumber,
                 amount,
                 type: 'credit'
             });
@@ -193,7 +193,7 @@ class WalletService {
                 timestamp: new Date()
             });
             await senderMessage.save();
-            sendSMSNotification("254717064174", senderMessage.message);
+            // sendSMSNotification("254717064174", senderMessage.message);
 
             // Send notification to receiver
             const receiverMessage = new Notification({
@@ -202,7 +202,7 @@ class WalletService {
                 timestamp: new Date()
             });
             await receiverMessage.save();
-            sendSMSNotification("254717064174", receiverMessage.message);
+            // sendSMSNotification("254717064174", receiverMessage.message);
 
             // Release lock
             this.transactionLock = false;

@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const sms_1 = require("../integrations/sms");
 const schema_1 = require("../models/schema");
 const utils_1 = require("./../utils/utils");
 const logger_1 = require("../utils/logger");
@@ -160,7 +159,7 @@ class WalletService {
                 // Create receiver's transaction
                 const receiverTransaction = yield schema_1.Transaction.create({
                     senderId: userId,
-                    receiverWalletAccountNumber: receiver.walletAccountNumber,
+                    walletAccountNumber: receiver.walletAccountNumber,
                     amount,
                     type: 'credit'
                 });
@@ -172,7 +171,7 @@ class WalletService {
                     timestamp: new Date()
                 });
                 yield senderMessage.save();
-                (0, sms_1.sendSMSNotification)("254717064174", senderMessage.message);
+                // sendSMSNotification("254717064174", senderMessage.message);
                 // Send notification to receiver
                 const receiverMessage = new schema_1.Notification({
                     userId: wallet.userId,
@@ -180,7 +179,7 @@ class WalletService {
                     timestamp: new Date()
                 });
                 yield receiverMessage.save();
-                (0, sms_1.sendSMSNotification)("254717064174", receiverMessage.message);
+                // sendSMSNotification("254717064174", receiverMessage.message);
                 // Release lock
                 this.transactionLock = false;
                 return { success: true, wallet };
