@@ -9,7 +9,7 @@ class TransactionService {
 
     async sendFunds(req: Request): Promise<{ success: boolean; newBalance?: number; error?: string }> {
 
-        this.logger.logInfo("SendFunds", JSON.stringify(req));
+        this.logger.logInfo("SendFunds" + req);
         
         try {
             const { amount, receiverAccountNumber } = req.body;
@@ -154,7 +154,7 @@ class TransactionService {
 
     async getTransactionsByWalletId(req: Request): Promise<{ success: boolean; transactions?: any[]; error?: string }> {
 
-        this.logger.logInfo("getTransactionsByWalletId", JSON.stringify(req));
+        this.logger.logInfo("getTransactionsByWalletId"+ req);
 
         try {
             const token = req.headers.authorization?.split(' ')[1];

@@ -25,7 +25,7 @@ class WalletService {
     }
     createWallet(walletData, token) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.logger.logInfo('createWallet payload: ' + JSON.stringify(walletData));
+            this.logger.logInfo('createWallet payload: ' + walletData);
             try {
                 const { name, openedAt, expiresAt, isSuspended, balance, currency } = walletData.body;
                 // Check if the authorization header is missing
@@ -94,7 +94,7 @@ class WalletService {
     debitWallet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("debitWallet', req: " + JSON.stringify(req));
+            this.logger.logInfo("debitWallet', req: " + req);
             try {
                 const { amount, walletAccountNumber } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];

@@ -9,7 +9,7 @@ class CurrencyService {
     private logger = new CustomLogger();
     async createCurrency(req: Request): Promise<{ success: boolean; currency?: any; error?: string }> {
 
-        this.logger.logInfo('create Currency', JSON.stringify(req));
+        this.logger.logInfo('create Currency'+ req);
 
         try {
             const token = req.headers.authorization?.split(' ')[1];
@@ -66,7 +66,7 @@ class CurrencyService {
 
     async getCurrencies(req: Request): Promise<{ success: boolean; currencies?: any[]; error?: string }> {
 
-        this.logger.logInfo("getCurrencies", JSON.stringify(req));
+        this.logger.logInfo("getCurrencies"+ req);
 
         try {
             const token = req.headers.authorization?.split(' ')[1];

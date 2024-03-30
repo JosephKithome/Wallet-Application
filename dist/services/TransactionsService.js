@@ -23,7 +23,7 @@ class TransactionService {
     sendFunds(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("SendFunds", JSON.stringify(req));
+            this.logger.logInfo("SendFunds" + req);
             try {
                 const { amount, receiverAccountNumber } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
@@ -141,7 +141,7 @@ class TransactionService {
     getTransactionsByWalletId(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("getTransactionsByWalletId", JSON.stringify(req));
+            this.logger.logInfo("getTransactionsByWalletId" + req);
             try {
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
                 if (!token) {
