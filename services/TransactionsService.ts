@@ -154,7 +154,7 @@ class TransactionService {
 
     async getTransactionsByWalletId(req: Request): Promise<{ success: boolean; transactions?: any[]; error?: string }> {
 
-        this.logger.logInfo("getTransactionsByWalletId"+ req);
+        this.logger.logInfo("getTransactionsByWalletId"+ req.params.walletId);
 
         try {
             const token = req.headers.authorization?.split(' ')[1];

@@ -376,7 +376,8 @@ class WalletService {
             const transaction = await Transaction.create({
                 senderId: userId,
                 amount,
-                type: 'credit'
+                type: 'credit',
+                walletAccountNumber: wallet.walletAccountNumber
             });
 
             transaction.save();
@@ -396,7 +397,7 @@ class WalletService {
         } catch (error: any) {
 
             this.logger.logError('Error crediting wallet:', error.message.toString());
-            return { success: false, error: "Error retrieving a wallet" };
+            return { success: false, error: "Error crediting a wallet" };
         }
     }
 

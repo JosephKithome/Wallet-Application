@@ -327,7 +327,8 @@ class WalletService {
                 const transaction = yield schema_1.Transaction.create({
                     senderId: userId,
                     amount,
-                    type: 'credit'
+                    type: 'credit',
+                    walletAccountNumber: wallet.walletAccountNumber
                 });
                 transaction.save();
                 // send notification
@@ -342,7 +343,7 @@ class WalletService {
             }
             catch (error) {
                 this.logger.logError('Error crediting wallet:', error.message.toString());
-                return { success: false, error: "Error retrieving a wallet" };
+                return { success: false, error: "Error crediting a wallet" };
             }
         });
     }
