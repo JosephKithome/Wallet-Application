@@ -9,7 +9,7 @@ class TransactionService {
 
     async sendFunds(req: Request): Promise<{ success: boolean; newBalance?: number; error?: string }> {
 
-        this.logger.logInfo("SendFunds" + req);
+        this.logger.logInfo("SendFunds" + JSON.stringify(req.body));
         
         try {
             const { amount, receiverAccountNumber } = req.body;
@@ -87,7 +87,7 @@ class TransactionService {
             await message.save();
 
             // Trigger notification here
-            sendSMSNotification("254717064174", message.message);
+            // sendSMSNotification("254717064174", message.message);
 
             const tr = new Transaction({
                 senderId: receiver.userId,

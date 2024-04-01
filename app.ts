@@ -40,6 +40,7 @@ const  logger = new CustomLogger();
 
 app.post("/api/v1/user/signup", authController.signUp);
 app.post("/api/v1/user/login", authController.login);
+app.post("/api/v1/user/reset-password", authController.resetPassword);
 app.get('/api/v1/user/:userId', userController.getUserById);
 app.put('/api/v1/user/:userId', userController.updateUserProfile);
 app.post('/api/v1/wallet', walletController.createWallet);

@@ -7,11 +7,11 @@ export class MongoConnector {
         mongoose
         .connect('mongodb+srv://blackberry:6NRlEX0xkOj0lXEa@vibewire.uze1ulu.mongodb.net/?retryWrites=true&w=majority&appName=vibewire')
         .then(() => {
-            this.logger.logInfo('Connected to MongoDB');
+            console.log('Connected to MongoDB');
         
         })
         .catch((error: any) => {
-            this.logger.logError('MongoDB connection error:', error.message.toString());
+            console.log('MongoDB connection error:', error.message.toString());
         });
     
 

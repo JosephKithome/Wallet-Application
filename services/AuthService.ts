@@ -1,8 +1,11 @@
 import { User } from '../models/schema';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { CustomLogger } from '../utils/logger';
 
 class AuthService {
+
+    private logger = new CustomLogger();
 
     async registerUser(userData: any) {
         try {
@@ -79,6 +82,66 @@ class AuthService {
             console.error(error);
             throw new Error("Internal Server Error");
         }
+    }
+    async resetPassword(req: any, token: string): Promise<{ success: boolean; user?: any; error?: string }> {
+        
+        this.logger.logInfo('Reseting  payload: ' + req.body);
+
+        try {
+
+            const { oldPassword, newPassword } = req.body;
+
+            // Check if the authorization header is missing
+            if (!token || token === "null") {
+                return { success: false, error: "Unauthorized" };
+            }
+
+            // Check if the token is null
+            if (token === "null") {
+                return { success: false, error: "Unauthorized" };
+            }
+
+            let payload: any;
+
+            try {
+                // Verify the token
+                payload = jwt.verify(token, `${process.env.SECRET_KEY}`);
+            } catch (error) {
+                return { success: false, error: "Unauthorized" };
+            }
+
+            // Check if payload is valid
+            if (!payload || typeof payload === 'string') {
+                return { success: false, error: "Unauthorized" };
+            }
+             // Check if the token has expired
+             if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                return { success: false, error: "Token has expired" };
+            }
+            // Extract userId from payload
+            const userId = payload.subject;
+
+            this.logger.logInfo("UserID: " + userId);
+
+            // Check if the user already has a wallet
+            const existingUser = await User.findOne({ userId: userId });
+            if (!existingUser) {
+
+                return { success: false, error: "No user Found!" };
+            }else{
+                const hashedPassword = await bcrypt.hash(newPassword, 12);
+                existingUser.password = hashedPassword
+                existingUser.save();
+                return { success: false, error: "Password changed successfully" };
+            }
+        } catch (error: any) {
+            this.logger.logError('Error changing password:', error.message.toString());
+            return { success: false, error: "Error when changing password" };
+        }
+    }
+
+    logout = async () =>{
+
     }
 }
 

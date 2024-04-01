@@ -53,5 +53,24 @@ class AuthController {
             }
         });
     }
+    resetPassword(req, resp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const authService = new AuthService_1.default();
+                const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
+                const result = yield authService.resetPassword(req, token || '');
+                if (result.success) {
+                    resp.status(201).json({ message: 'Password changed successfully', wallet: result.user });
+                }
+                else {
+                    resp.status(400).json({ error: result.error });
+                }
+            }
+            catch (error) {
+                resp.status(500).json({ error: 'An unexpected error occurred' });
+            }
+        });
+    }
 }
 exports.AuthController = AuthController;

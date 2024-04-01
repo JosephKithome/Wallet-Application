@@ -22,7 +22,7 @@ class CurrencyService {
     createCurrency(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo('create Currency' + req);
+            this.logger.logInfo('create Currency' + JSON.stringify(req.body));
             try {
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
                 if (!token) {
@@ -68,7 +68,7 @@ class CurrencyService {
     getCurrencies(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("getCurrencies" + req);
+            this.logger.logInfo("getCurrencies" + JSON.stringify(req.body));
             try {
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
                 if (!token) {

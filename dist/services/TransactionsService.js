@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const schema_1 = require("../models/schema");
-const sms_1 = require("../integrations/sms");
 const logger_1 = require("../utils/logger");
 class TransactionService {
     constructor() {
@@ -23,7 +22,7 @@ class TransactionService {
     sendFunds(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("SendFunds" + req);
+            this.logger.logInfo("SendFunds" + JSON.stringify(req.body));
             try {
                 const { amount, receiverAccountNumber } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
@@ -82,7 +81,7 @@ class TransactionService {
                 });
                 yield message.save();
                 // Trigger notification here
-                (0, sms_1.sendSMSNotification)("254717064174", message.message);
+                // sendSMSNotification("254717064174", message.message);
                 const tr = new schema_1.Transaction({
                     senderId: receiver.userId,
                     receiverId: wallet.userId,

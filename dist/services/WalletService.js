@@ -24,7 +24,7 @@ class WalletService {
     }
     createWallet(walletData, token) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.logger.logInfo('createWallet payload: ' + walletData);
+            this.logger.logInfo('createWallet payload: ' + JSON.stringify(walletData.body));
             try {
                 const { name, openedAt, expiresAt, isSuspended, balance, currency } = walletData.body;
                 // Check if the authorization header is missing
@@ -93,7 +93,7 @@ class WalletService {
     debitWallet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("debitWallet', req: " + req);
+            this.logger.logInfo("debitWallet', req: " + JSON.stringify(req.body));
             try {
                 const { amount, walletAccountNumber } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
@@ -199,7 +199,7 @@ class WalletService {
     getWalletBalance(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("getWalletBalance', req: " + req);
+            this.logger.logInfo("getWalletBalance', req: " + JSON.stringify(req.body));
             try {
                 const { walletAccountNumber } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
@@ -238,7 +238,7 @@ class WalletService {
     }
     getWalletByName(walletData, token) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.logger.logInfo("getWalletByName', walletData: " + walletData);
+            this.logger.logInfo("getWalletByName', walletData: " + JSON.stringify(walletData.body));
             try {
                 const { name } = walletData.body;
                 // Check if the authorization header is missing
@@ -285,7 +285,7 @@ class WalletService {
     }
     creditWallet(req, token) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.logger.logInfo("creditWallet', req: " + req);
+            this.logger.logInfo("creditWallet', req: " + JSON.stringify(req.body));
             const { amount } = req.body;
             try {
                 // Check if the authorization header is missing
@@ -349,7 +349,7 @@ class WalletService {
     withdrawFunds(req) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.logInfo("withdrawFunds', req: " + req);
+            this.logger.logInfo("withdrawFunds', req: " + JSON.stringify(req.body));
             try {
                 const { amount } = req.body;
                 const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];

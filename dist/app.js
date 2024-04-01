@@ -35,6 +35,7 @@ const bankController = new BankController_1.BankController();
 const logger = new logger_1.CustomLogger();
 exports.app.post("/api/v1/user/signup", authController.signUp);
 exports.app.post("/api/v1/user/login", authController.login);
+exports.app.post("/api/v1/user/reset-password", authController.resetPassword);
 exports.app.get('/api/v1/user/:userId', userController.getUserById);
 exports.app.put('/api/v1/user/:userId', userController.updateUserProfile);
 exports.app.post('/api/v1/wallet', walletController.createWallet);

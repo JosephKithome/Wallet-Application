@@ -19,7 +19,7 @@ class WalletService {
 
     async createWallet(walletData: any, token: string): Promise<{ success: boolean; wallet?: any; error?: string }> {
         
-        this.logger.logInfo('createWallet payload: ' + walletData);
+        this.logger.logInfo('createWallet payload: ' + JSON.stringify(walletData.body));
 
         try {
 
@@ -95,7 +95,7 @@ class WalletService {
         }
     }
     async debitWallet(req: Request): Promise<{ success: boolean; wallet?: any; error?: string }> {
-        this.logger.logInfo("debitWallet', req: " + req);
+        this.logger.logInfo("debitWallet', req: " + JSON.stringify(req.body));
 
         try {
             const { amount, walletAccountNumber } = req.body;
@@ -221,7 +221,7 @@ class WalletService {
 
     async getWalletBalance(req: Request): Promise<{ success: boolean; wallet?: any; error?: string }> {
 
-        this.logger.logInfo("getWalletBalance', req: " + req);
+        this.logger.logInfo("getWalletBalance', req: " + JSON.stringify(req.body));
 
         try {
             const { walletAccountNumber } = req.body;
@@ -268,7 +268,7 @@ class WalletService {
     }
     async getWalletByName(walletData: any, token: string): Promise<{ success: boolean; wallet?: any; error?: string }> {
 
-        this.logger.logInfo("getWalletByName', walletData: " + walletData);
+        this.logger.logInfo("getWalletByName', walletData: " + JSON.stringify(walletData.body));
 
         try {
 
@@ -323,7 +323,7 @@ class WalletService {
 
     async creditWallet(req: any, token: string): Promise<{ success: boolean; wallet?: any; error?: string }> {
 
-        this.logger.logInfo("creditWallet', req: " + req);
+        this.logger.logInfo("creditWallet', req: " + JSON.stringify(req.body));
 
         const { amount } = req.body;
 
@@ -403,7 +403,7 @@ class WalletService {
 
     async withdrawFunds(req: Request): Promise<{ success: boolean; newBalance?: number; error?: string }> {
 
-        this.logger.logInfo("withdrawFunds', req: " + req);
+        this.logger.logInfo("withdrawFunds', req: " + JSON.stringify(req.body));
 
         try {
 

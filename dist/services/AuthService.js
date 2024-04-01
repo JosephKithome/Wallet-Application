@@ -15,7 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const schema_1 = require("../models/schema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const logger_1 = require("../utils/logger");
 class AuthService {
+    constructor() {
+        this.logger = new logger_1.CustomLogger();
+        this.logout = () => __awaiter(this, void 0, void 0, function* () {
+        });
+    }
     registerUser(userData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -85,6 +91,56 @@ class AuthService {
             catch (error) {
                 console.error(error);
                 throw new Error("Internal Server Error");
+            }
+        });
+    }
+    resetPassword(req, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.logger.logInfo('Reseting  payload: ' + req.body);
+            try {
+                const { oldPassword, newPassword } = req.body;
+                // Check if the authorization header is missing
+                if (!token || token === "null") {
+                    return { success: false, error: "Unauthorized" };
+                }
+                // Check if the token is null
+                if (token === "null") {
+                    return { success: false, error: "Unauthorized" };
+                }
+                let payload;
+                try {
+                    // Verify the token
+                    payload = jsonwebtoken_1.default.verify(token, `${process.env.SECRET_KEY}`);
+                }
+                catch (error) {
+                    return { success: false, error: "Unauthorized" };
+                }
+                // Check if payload is valid
+                if (!payload || typeof payload === 'string') {
+                    return { success: false, error: "Unauthorized" };
+                }
+                // Check if the token has expired
+                if (payload.expiresAt && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+                    return { success: false, error: "Token has expired" };
+                }
+                // Extract userId from payload
+                const userId = payload.subject;
+                this.logger.logInfo("UserID: " + userId);
+                // Check if the user already has a wallet
+                const existingUser = yield schema_1.User.findOne({ userId: userId });
+                if (!existingUser) {
+                    return { success: false, error: "No user Found!" };
+                }
+                else {
+                    const hashedPassword = yield bcrypt_1.default.hash(newPassword, 12);
+                    existingUser.password = hashedPassword;
+                    existingUser.save();
+                    return { success: false, error: "Password changed successfully" };
+                }
+            }
+            catch (error) {
+                this.logger.logError('Error changing password:', error.message.toString());
+                return { success: false, error: "Error when changing password" };
             }
         });
     }

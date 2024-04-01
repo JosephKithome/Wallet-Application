@@ -33,6 +33,26 @@ export class AuthController {
             resp.status(500).send("Internal Server Error");
         }
     }
+
+    async resetPassword(req: Request, resp: Response) {
+        try {
+
+            const authService = new AuthService();
+
+            const token = req.headers.authorization?.split(' ')[1];
+
+            const result = await authService.resetPassword(req, token || '');
+
+            if (result.success) {
+                resp.status(201).json({ message: 'Password changed successfully', wallet: result.user });
+            } else {
+                resp.status(400).json({ error: result.error });
+            }
+        } catch (error) {
+            resp.status(500).json({ error: 'An unexpected error occurred' });
+        }
+
+    }
     }
   
 
