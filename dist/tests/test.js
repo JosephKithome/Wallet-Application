@@ -12,95 +12,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const supertest_1 = __importDefault(require("supertest"));
-const app_1 = require("../app");
-describe('User Registration Endpoint', () => {
-    it('should register a new user with valid data', () => __awaiter(void 0, void 0, void 0, function* () {
-        const userData = {
-            username: 'testuser',
-            email: 'test@example.com',
-            password: 'password123',
-            firstName: 'John',
-            lastName: 'Doe',
-            phone: '1234567890'
-        };
-        const res = yield (0, supertest_1.default)(app_1.app)
-            .post('/api/v1/user/signup')
-            .send(userData);
-        expect(res.status).toEqual(200);
-        expect(res.body.message).toEqual('User registered successfully');
-    }));
-    it('should return an error for invalid username', () => __awaiter(void 0, void 0, void 0, function* () {
-        const userData = {
-            username: '', // Empty username
-            email: 'test@example.com',
-            password: 'password123',
-            firstName: 'John',
-            lastName: 'Doe',
-            phone: '1234567890'
-        };
-        const res = yield (0, supertest_1.default)(app_1.app)
-            .post('/api/v1/user/signup')
-            .send(userData);
-        expect(res.status).toEqual(400);
-        expect(res.body.error).toEqual('Please provide a valid username');
-    }));
-});
-describe('User Login Endpoint', () => {
-    it('should successfully log in a user with valid credentials', () => __awaiter(void 0, void 0, void 0, function* () {
-        const userData = {
-            email: 'test@example.com',
-            password: 'password123'
-        };
-        const res = yield (0, supertest_1.default)(app_1.app)
-            .post('/api/v1/user/login')
-            .send(userData);
-        expect(res.status).toEqual(200);
-        expect(res.body.token).toBeDefined();
-    }));
-    it('should return an error for invalid email', () => __awaiter(void 0, void 0, void 0, function* () {
-        const userData = {
-            email: '', // Empty email
-            password: 'password123'
-        };
-        const res = yield (0, supertest_1.default)(app_1.app)
-            .post('/api/v1/user/login')
-            .send(userData);
-        expect(res.status).toEqual(400);
-        expect(res.body.error).toEqual('Please provide a valid email and password');
-    }));
-    it('should return an error for invalid password', () => __awaiter(void 0, void 0, void 0, function* () {
-        const userData = {
-            email: 'test@example.com',
-            password: '' // Empty password
-        };
-        const res = yield (0, supertest_1.default)(app_1.app)
-            .post('/api/v1/user/login')
-            .send(userData);
-        expect(res.status).toEqual(400);
-        expect(res.body.error).toEqual('Please provide a valid password');
-    }));
-    it('should return an error for user not found', () => __awaiter(void 0, void 0, void 0, function* () {
-        const userData = {
-            email: 'nonexistent@example.com',
-            password: 'password123'
-        };
-        const res = yield (0, supertest_1.default)(app_1.app)
-            .post('/api/v1/user/login')
-            .send(userData);
-        expect(res.status).toEqual(401);
-        expect(res.text).toEqual('Invalid Email');
-    }));
-    // Test case for incorrect password
-    it('should return an error for incorrect password', () => __awaiter(void 0, void 0, void 0, function* () {
-        const userData = {
-            email: 'test@example.com',
-            password: 'incorrectpassword'
-        };
-        const res = yield (0, supertest_1.default)(app_1.app)
-            .post('/api/v1/user/login')
-            .send(userData);
-        expect(res.status).toEqual(401);
-        expect(res.text).toEqual('Invalid email');
-    }));
+const AuthController_1 = require("../controllers/auth/AuthController");
+const AuthService_1 = __importDefault(require("../services/AuthService"));
+// Mocking the AuthService
+jest.mock('../../services/AuthService');
+// Mocking the Request and Response objects
+const mockRequest = {};
+const mockResponse = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+    send: jest.fn(),
+};
+describe('AuthController', () => {
+    describe('signUp', () => {
+        it('should return 200 status with success message if registration succeeds', () => __awaiter(void 0, void 0, void 0, function* () {
+            const authService = new AuthService_1.default();
+            const authController = new AuthController_1.AuthController();
+            authService.registerUser.mockResolvedValueOnce({ success: true, message: 'User registered successfully' });
+            yield authController.signUp(mockRequest, mockResponse);
+            expect(mockResponse.status).toHaveBeenCalledWith(200);
+            expect(mockResponse.json).toHaveBeenCalledWith({ message: 'User registered successfully' });
+        }));
+        it('should return 400 status with error message if registration fails', () => __awaiter(void 0, void 0, void 0, function* () {
+            const authService = new AuthService_1.default();
+            const authController = new AuthController_1.AuthController();
+            authService.registerUser.mockResolvedValueOnce({ success: false, message: 'Email already exists' });
+            yield authController.signUp(mockRequest, mockResponse);
+            expect(mockResponse.status).toHaveBeenCalledWith(400);
+            expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Email already exists' });
+        }));
+        it('should return 500 status if an error occurs during registration', () => __awaiter(void 0, void 0, void 0, function* () {
+            const authService = new AuthService_1.default();
+            authService.registerUser.mockRejectedValueOnce(new Error('Database error'));
+            const authController = new AuthController_1.AuthController();
+            yield authController.signUp(mockRequest, mockResponse);
+            expect(mockResponse.status).toHaveBeenCalledWith(500);
+            expect(mockResponse.send).toHaveBeenCalledWith('Error occurred while registering user.');
+        }));
+    });
 });

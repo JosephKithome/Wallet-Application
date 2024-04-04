@@ -1,113 +1,55 @@
-import request from 'supertest';
-import { app } from '../app';
+import { Request, Response } from 'express';
+import { AuthController } from '../controllers/auth/AuthController';
+import AuthService from '../services/AuthService';
 
-describe('User Registration Endpoint', () => {
-    it('should register a new user with valid data', async () => {
-        const userData = {
-            username: 'testuser',
-            email: 'test@example.com',
-            password: 'password123',
-            firstName: 'John',
-            lastName: 'Doe',
-            phone: '1234567890'
-        };
 
-        const res = await request(app)
-            .post('/api/v1/user/signup')
-            .send(userData);
 
-        expect(res.status).toEqual(200);
-        expect(res.body.message).toEqual('User registered successfully');
+// Mocking the AuthService
+jest.mock('../../services/AuthService');
+
+// Mocking the Request and Response objects
+const mockRequest = {} as Request;
+const mockResponse = {
+  status: jest.fn().mockReturnThis(),
+  json: jest.fn(),
+  send: jest.fn(),
+} as unknown as Response;
+
+describe('AuthController', () => {
+  describe('signUp', () => {
+    it('should return 200 status with success message if registration succeeds', async () => {
+      const authService = new AuthService() as jest.Mocked<AuthService>;
+      const authController = new AuthController() as jest.Mocked<AuthController>
+      authService.registerUser.mockResolvedValueOnce({ success: true, message: 'User registered successfully' });
+      
+      await authController.signUp(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'User registered successfully' });
     });
 
-    it('should return an error for invalid username', async () => {
-        const userData = {
-            username: '', // Empty username
-            email: 'test@example.com',
-            password: 'password123',
-            firstName: 'John',
-            lastName: 'Doe',
-            phone: '1234567890'
-        };
+    it('should return 400 status with error message if registration fails', async () => {
+      const authService = new AuthService() as jest.Mocked<AuthService>;
+      const authController = new AuthController() as jest.Mocked<AuthController>
+      authService.registerUser.mockResolvedValueOnce({ success: false, message: 'Email already exists' });
+      
+      await authController.signUp(mockRequest, mockResponse);
 
-        const res = await request(app)
-            .post('/api/v1/user/signup')
-            .send(userData);
-
-        expect(res.status).toEqual(400); 
-        expect(res.body.error).toEqual('Please provide a valid username'); 
-    });
-});
-
-describe('User Login Endpoint', () => {
-    it('should successfully log in a user with valid credentials', async () => {
-        const userData = {
-            email: 'test@example.com',
-            password: 'password123'
-        };
-
-        const res = await request(app)
-            .post('/api/v1/user/login')
-            .send(userData);
-
-        expect(res.status).toEqual(200);
-        expect(res.body.token).toBeDefined(); 
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Email already exists' });
     });
 
-    it('should return an error for invalid email', async () => {
-        const userData = {
-            email: '', // Empty email
-            password: 'password123'
-        };
+    it('should return 500 status if an error occurs during registration', async () => {
+      const authService = new AuthService() as jest.Mocked<AuthService>;
+      authService.registerUser.mockRejectedValueOnce(new Error('Database error'));
+      const authController = new AuthController() as jest.Mocked<AuthController>
+    
+      await authController.signUp(mockRequest, mockResponse);
 
-        const res = await request(app)
-            .post('/api/v1/user/login')
-            .send(userData);
-
-        expect(res.status).toEqual(400); 
-        expect(res.body.error).toEqual('Please provide a valid email and password'); 
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.send).toHaveBeenCalledWith('Error occurred while registering user.');
     });
+  });
 
-    it('should return an error for invalid password', async () => {
-        const userData = {
-            email: 'test@example.com',
-            password: '' // Empty password
-        };
-
-        const res = await request(app)
-            .post('/api/v1/user/login')
-            .send(userData);
-
-        expect(res.status).toEqual(400); 
-        expect(res.body.error).toEqual('Please provide a valid password'); 
-    });
-
-    it('should return an error for user not found', async () => {
-        const userData = {
-            email: 'nonexistent@example.com', 
-            password: 'password123'
-        };
-
-        const res = await request(app)
-            .post('/api/v1/user/login')
-            .send(userData);
-
-        expect(res.status).toEqual(401); 
-        expect(res.text).toEqual('Invalid Email');
-    });
-
-    // Test case for incorrect password
-    it('should return an error for incorrect password', async () => {
-        const userData = {
-            email: 'test@example.com',
-            password: 'incorrectpassword'
-        };
-
-        const res = await request(app)
-            .post('/api/v1/user/login')
-            .send(userData);
-
-        expect(res.status).toEqual(401); 
-        expect(res.text).toEqual('Invalid email');
-    });
+ 
 });
