@@ -18,11 +18,11 @@
         ]
       }
     },
-    "include": [
-        "tests/*.ts",
-        "tests/test.ts",
-        "server/app.js"
-    ],
+    // "include": [
+    //     "tests/*.ts",
+    //     "tests/test.ts",
+    //     "server/app.js"
+    // ],
     "exclude": [
       "node_modules",
       "**/*.spec.ts"

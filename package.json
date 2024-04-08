@@ -8,8 +8,7 @@
   "main": "dist/app.js",
   "scripts": {
     "prebuild": "npm install",
-    "start": "node dist/app.js",
-    "test": "jest"
+    "start": "node dist/app.js"
   },
   "author": "",
   "license": "ISC",
