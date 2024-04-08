@@ -1,7 +1,6 @@
 
 
 import express, { Application, Request, Response } from 'express';
-import winston from 'winston';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from './documentation/swagger';
