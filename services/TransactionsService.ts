@@ -145,6 +145,8 @@ class TransactionService {
                 $or: [{ senderId: userId }, { receiverId: userId }],
             }).sort({ timestamp: -1 });
 
+            this.logger.logInfo("We got!!"+ JSON.stringify(transactions));
+
             return { success: true, transactions };
         } catch (error:any) {
             this.logger.logError('Error getting wallet transactions', error.message);

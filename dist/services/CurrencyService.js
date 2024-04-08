@@ -92,6 +92,7 @@ class CurrencyService {
                 const userId = payload.subject;
                 // Query the database to find all currencies
                 const currencies = yield schema_1.Currency.find();
+                this.logger.logInfo("We got!!" + JSON.stringify(currencies));
                 return { success: true, currencies };
             }
             catch (error) {
