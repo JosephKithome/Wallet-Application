@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MongoConnector = void 0;
 var mongoose_1 = require("mongoose");
-var logger_1 = require("../utils/logger");
+var logger_1 = require("../../utils/logger");
 var MongoConnector = /** @class */ (function () {
     function MongoConnector() {
         this.logger = new logger_1.CustomLogger();
