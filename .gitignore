@@ -2,3 +2,6 @@
 /logs
 nodemon.json
 .env
+/microservices/user/node_modules/
+/microservices/apiGateway/node_modules/
+/microservices/wallet/node_modules
