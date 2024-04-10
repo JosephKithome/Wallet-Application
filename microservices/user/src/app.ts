@@ -1,5 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 import bodyParser from 'body-parser';
+import { AuthController } from './controllers/auth/AuthController';
+import { CustomLogger } from './utils/logger';
+import { MongoConnector } from './database/mongoConnector';
 
 
 
@@ -8,8 +11,14 @@ export const app: Application = express();
 // Middleware
 app.use(bodyParser.json());
 
-// Swagger setup
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const  mongoConnector = new MongoConnector();
+const authController = new AuthController();
+const  logger = new CustomLogger();
+
+
+app.post("/api/v1/user/signup", authController.signUp);
+app.post("/api/v1/user/login", authController.login);
+
 
 // Routes
 app.get('/', (req, res) => {
@@ -55,7 +64,7 @@ const PORT = process.env.PORT || 3000;
 
 function runServer() {
     try {
-        // mongoConnector.connect();
+        mongoConnector.connect();
         app.listen(PORT, () => {
             console.log(`Server started on port ${PORT}`)
         });
