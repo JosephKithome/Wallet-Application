@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import { AuthController } from './controllers/auth/AuthController';
 import { CustomLogger } from './utils/logger';
 import { MongoConnector } from './database/mongoConnector';
+import { RoleController } from './controllers/auth/RolesController';
 
 
 
@@ -11,13 +12,18 @@ export const app: Application = express();
 // Middleware
 app.use(bodyParser.json());
 
+const  logger = new CustomLogger();
 const  mongoConnector = new MongoConnector();
 const authController = new AuthController();
-const  logger = new CustomLogger();
+const roleController = new RoleController();
 
 
 app.post("/api/v1/user/signup", authController.signUp);
 app.post("/api/v1/user/login", authController.login);
+app.post("/api/v1/role/", roleController.createRole);
+app.get("/api/v1/role", roleController.listRoles);
+app.get("/api/v1/role/:roleId", roleController.listById);
+app.put("/api/v1/role", roleController.updateRole);
 
 
 // Routes

@@ -1,0 +1,2 @@
+{"level":"info","message":"createRole payload: {}"}
+{"level":"info","message":"createRole payload: {\"name\":\"APP-ADMIN\",\"description\":\"This role is given to the Admin who has limitted access to the system\"}"}

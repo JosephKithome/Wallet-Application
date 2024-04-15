@@ -27,6 +27,30 @@ export const User = mongoose.model<UserDocument>('User', userSchema);
 
 /*****************************************End  User schema***************************************************************************** */
 
+/*****************************************Define Role schema***************************************************************************** */
+export interface RoleDocument extends Document {
+    name: string;
+    description: string;
+    is_active: boolean;
+    created_at: Date;
+    updated_at: Date; 
+    created_by: Date;
+}
+
+const roleSchema: Schema = new Schema({
+    name: { type: String, required: true },
+    description: { type: String, required: true},
+    is_active: { type: String, required: true },
+    created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date, default: Date.now },
+    created_by: { type: Schema.Types.ObjectId, ref: 'User', required: false},
+
+});
+
+export const Role = mongoose.model<RoleDocument>('Role', roleSchema);
+
+/*****************************************End  Role schema***************************************************************************** */
+
 /*****************************************Define Wallet schema***************************************************************************** */
 export interface WalletDocument extends Document {
     userId: string;

@@ -8,7 +8,7 @@ export class MongoConnector {
 
      connect = ()=>{
         mongoose
-        .connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@vibewire.uze1ulu.mongodb.net/?retryWrites=true&w=majority&appName=vibewire`)
+        .connect(`mongodb+srv://blackberry:6NRlEX0xkOj0lXEa@vibewire.uze1ulu.mongodb.net/?retryWrites=true&w=majority&appName=vibewire`)
         .then(() => {
             console.log('Connected to MongoDB');
         

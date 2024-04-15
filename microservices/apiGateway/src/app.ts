@@ -12,7 +12,7 @@ app.use(cors());
 
 
 app.use("/wallet", expressHttpProxy("http://localhost:3001"));
-app.use("/auth", expressHttpProxy("http://localhost:3000"));
+app.use("/auth/", expressHttpProxy("http://localhost:3000"));
 
 // Routes
 app.get('/', (req, res) => {
