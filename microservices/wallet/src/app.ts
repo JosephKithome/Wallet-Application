@@ -1,12 +1,29 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 
+import { MongoConnector } from './database/mongoConnector';
+import { WalletControlller } from './controller/WalletController';
+import { CustomLogger } from './utils/logger';
+
+
+const  mongoConnector = new MongoConnector();
+const walletController = new WalletControlller();
+const  logger = new CustomLogger();
 
 
 export const app: Application = express();
 
 // Middleware
 app.use(bodyParser.json());
+
+
+app.post('/api/v1/wallet', walletController.createWallet);
+app.post('/api/v1/wallet/credit', walletController.creditWallet);
+app.post('/api/v1/wallet/debit', walletController.debitWallet);
+app.get('/api/v1/wallet/balance', walletController.getWalletBalance);
+app.get('/api/v1/wallet', walletController.getWalletbyName);
+app.post('/api/v1/user/wallet/withdraw', walletController.withdrawFunds)
+
 
 // Swagger setup
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -55,9 +72,9 @@ const PORT = process.env.PORT || 3001;
 
 function runServer() {
     try {
-        // mongoConnector.connect();
+        mongoConnector.connect();
         app.listen(PORT, () => {
-            console.log(`Server started on port ${PORT}`)
+            logger.logInfo(`Server started on port http://localhost:${PORT}`)
         });
     } catch (e) {
         console.error(e);

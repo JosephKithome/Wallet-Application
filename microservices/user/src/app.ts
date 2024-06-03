@@ -72,7 +72,7 @@ function runServer() {
     try {
         mongoConnector.connect();
         app.listen(PORT, () => {
-            console.log(`Server started on port ${PORT}`)
+            console.log(`Server started on port http://localhost:${PORT}`)
         });
     } catch (e) {
         console.error(e);
